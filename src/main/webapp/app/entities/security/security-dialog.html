@@ -1,0 +1,66 @@
+
+<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="mySecurityLabel" data-translate="hipsterSharesApp.security.home.createOrEditLabel">Create or edit a Security</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.security.id">
+            <label for="id" data-translate="global.field.id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                    ng-model="vm.security.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="hipsterSharesApp.security.ticker" for="field_ticker">Ticker</label>
+            <input type="text" class="form-control" name="ticker" id="field_ticker"
+                    ng-model="vm.security.ticker"
+                    required />
+            <div ng-show="editForm.ticker.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.ticker.$error.required" data-translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="hipsterSharesApp.security.issuedUnits" for="field_issuedUnits">Issued Units</label>
+            <input type="number" class="form-control" name="issuedUnits" id="field_issuedUnits"
+                    ng-model="vm.security.issuedUnits"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="hipsterSharesApp.security.spotPrice" for="field_spotPrice">Spot Price</label>
+            <input type="number" class="form-control" name="spotPrice" id="field_spotPrice"
+                    ng-model="vm.security.spotPrice"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="hipsterSharesApp.security.currency" for="field_currency">Currency</label>
+            <select class="form-control" name="currency" ng-model="vm.security.currency" id="field_currency">
+                <option value="AUD" data-translate="hipsterSharesApp.Currency.AUD">AUD</option>
+                <option value="USD" data-translate="hipsterSharesApp.Currency.USD">USD</option>
+                <option value="EUR" data-translate="hipsterSharesApp.Currency.EUR">EUR</option>
+                <option value="JPY" data-translate="hipsterSharesApp.Currency.JPY">JPY</option>
+                <option value="GBP" data-translate="hipsterSharesApp.Currency.GBP">GBP</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label data-translate="hipsterSharesApp.security.company" for="field_company">Company</label>
+            <select class="form-control" id="field_company" name="company" ng-model="vm.security.company" ng-options="company as company.id for company in vm.companies track by company.id">
+                <option value=""></option>
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span data-translate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span data-translate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>

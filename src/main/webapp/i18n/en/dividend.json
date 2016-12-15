@@ -1,0 +1,27 @@
+{
+    "hipsterSharesApp": {
+        "dividend" : {
+            "home": {
+                "title": "Dividends",
+                "createLabel": "Create a new Dividend",
+                "createOrEditLabel": "Create or edit a Dividend",
+                "search": "Search for Dividend"
+            },
+            "created": "A new Dividend is created with identifier {{ param }}",
+            "updated": "A Dividend is updated with identifier {{ param }}",
+            "deleted": "A Dividend is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Dividend {{ id }}?"
+            },
+            "detail": {
+                "title": "Dividend"
+            },
+            "recordLocalDate": "Record Local Date",
+            "exLocalDate": "Ex Local Date",
+            "paymentLocalDate": "Payment Local Date",
+            "dps": "Dps",
+            "franking": "Franking",
+            "owns": "Owns"
+        }
+    }
+}

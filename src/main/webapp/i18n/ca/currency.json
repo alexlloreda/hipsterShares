@@ -1,0 +1,12 @@
+{
+    "hipsterSharesApp": {
+        "Currency" : {
+            "null": "",
+            "AUD": "AUD",
+            "USD": "USD",
+            "EUR": "EUR",
+            "JPY": "JPY",
+            "GBP": "GBP"
+        }
+    }
+}

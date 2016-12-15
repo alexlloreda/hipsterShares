@@ -1,0 +1,39 @@
+
+<div>
+    <h2><span data-translate="hipsterSharesApp.security.detail.title">Security</span> {{vm.security.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span data-translate="hipsterSharesApp.security.ticker">Ticker</span></dt>
+        <dd>
+            <span>{{vm.security.ticker}}</span>
+        </dd>
+        <dt><span data-translate="hipsterSharesApp.security.issuedUnits">Issued Units</span></dt>
+        <dd>
+            <span>{{vm.security.issuedUnits}}</span>
+        </dd>
+        <dt><span data-translate="hipsterSharesApp.security.spotPrice">Spot Price</span></dt>
+        <dd>
+            <span>{{vm.security.spotPrice}}</span>
+        </dd>
+        <dt><span data-translate="hipsterSharesApp.security.currency">Currency</span></dt>
+        <dd>
+            <span data-translate="{{'hipsterSharesApp.Currency.' + vm.security.currency}}">{{vm.security.currency}}</span>
+        </dd>
+        <dt><span data-translate="hipsterSharesApp.security.company">Company</span></dt>
+        <dd>
+            <a ui-sref="company-detail({id:vm.security.company.id})">{{vm.security.company.id}}</a>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span data-translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="security-detail.edit({id:vm.security.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" data-translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

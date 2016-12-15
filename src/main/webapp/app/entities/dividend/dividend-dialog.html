@@ -1,0 +1,74 @@
+
+<form name="editForm" role="form" novalidate ng-submit="vm.save()">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myDividendLabel" data-translate="hipsterSharesApp.dividend.home.createOrEditLabel">Create or edit a Dividend</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.dividend.id">
+            <label for="id" data-translate="global.field.id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                    ng-model="vm.dividend.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="hipsterSharesApp.dividend.recordLocalDate" for="field_recordLocalDate">Record Local Date</label>
+                <div class="input-group">
+                    <input id="field_recordLocalDate" type="text" class="form-control" name="recordLocalDate" uib-datepicker-popup="{{dateformat}}" ng-model="vm.dividend.recordLocalDate" is-open="vm.datePickerOpenStatus.recordLocalDate"
+                    />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="vm.openCalendar('recordLocalDate')"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="hipsterSharesApp.dividend.exLocalDate" for="field_exLocalDate">Ex Local Date</label>
+                <div class="input-group">
+                    <input id="field_exLocalDate" type="text" class="form-control" name="exLocalDate" uib-datepicker-popup="{{dateformat}}" ng-model="vm.dividend.exLocalDate" is-open="vm.datePickerOpenStatus.exLocalDate"
+                    />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="vm.openCalendar('exLocalDate')"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="hipsterSharesApp.dividend.paymentLocalDate" for="field_paymentLocalDate">Payment Local Date</label>
+                <div class="input-group">
+                    <input id="field_paymentLocalDate" type="text" class="form-control" name="paymentLocalDate" uib-datepicker-popup="{{dateformat}}" ng-model="vm.dividend.paymentLocalDate" is-open="vm.datePickerOpenStatus.paymentLocalDate"
+                    />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="vm.openCalendar('paymentLocalDate')"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="hipsterSharesApp.dividend.dps" for="field_dps">Dps</label>
+            <input type="number" class="form-control" name="dps" id="field_dps"
+                    ng-model="vm.dividend.dps"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="hipsterSharesApp.dividend.franking" for="field_franking">Franking</label>
+            <input type="number" class="form-control" name="franking" id="field_franking"
+                    ng-model="vm.dividend.franking"
+                     />
+        </div>
+
+        <div class="form-group">
+            <label data-translate="hipsterSharesApp.dividend.owns" for="field_owns">Owns</label>
+            <select class="form-control" id="field_owns" name="owns" ng-model="vm.dividend.owns" ng-options="security as security.id for security in vm.securities track by security.id">
+                <option value=""></option>
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span data-translate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span data-translate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>

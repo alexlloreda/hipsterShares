@@ -1,0 +1,26 @@
+{
+    "hipsterSharesApp": {
+        "security" : {
+            "home": {
+                "title": "Securities",
+                "createLabel": "Create a new Security",
+                "createOrEditLabel": "Create or edit a Security",
+                "search": "Search for Security"
+            },
+            "created": "A new Security is created with identifier {{ param }}",
+            "updated": "A Security is updated with identifier {{ param }}",
+            "deleted": "A Security is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Security {{ id }}?"
+            },
+            "detail": {
+                "title": "Security"
+            },
+            "ticker": "Ticker",
+            "issuedUnits": "Issued Units",
+            "spotPrice": "Spot Price",
+            "currency": "Currency",
+            "company": "Company"
+        }
+    }
+}

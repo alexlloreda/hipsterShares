@@ -1,0 +1,22 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "owns",
+            "otherEntityName": "securityLot",
+            "otherEntityRelationshipName": "portfolio"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20161215042333",
+    "entityTableName": "portfolio",
+    "dto": "no",
+    "pagination": "no",
+    "service": "no"
+}
