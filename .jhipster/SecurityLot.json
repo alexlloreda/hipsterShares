@@ -40,5 +40,5 @@
     "entityTableName": "security_lot",
     "dto": "no",
     "pagination": "no",
-    "service": "no"
+    "service": "serviceClass"
 }

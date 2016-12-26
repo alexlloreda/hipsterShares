@@ -2,9 +2,7 @@ package io.alex.hipstershares.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.alex.hipstershares.domain.Company;
-
-import io.alex.hipstershares.repository.CompanyRepository;
-import io.alex.hipstershares.repository.search.CompanySearchRepository;
+import io.alex.hipstershares.service.CompanyService;
 import io.alex.hipstershares.web.rest.util.HeaderUtil;
 
 import org.slf4j.Logger;
@@ -20,10 +18,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing Company.
@@ -35,10 +29,7 @@ public class CompanyResource {
     private final Logger log = LoggerFactory.getLogger(CompanyResource.class);
         
     @Inject
-    private CompanyRepository companyRepository;
-
-    @Inject
-    private CompanySearchRepository companySearchRepository;
+    private CompanyService companyService;
 
     /**
      * POST  /companies : Create a new company.
@@ -54,8 +45,7 @@ public class CompanyResource {
         if (company.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("company", "idexists", "A new company cannot already have an ID")).body(null);
         }
-        Company result = companyRepository.save(company);
-        companySearchRepository.save(result);
+        Company result = companyService.save(company);
         return ResponseEntity.created(new URI("/api/companies/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("company", result.getId().toString()))
             .body(result);
@@ -77,8 +67,7 @@ public class CompanyResource {
         if (company.getId() == null) {
             return createCompany(company);
         }
-        Company result = companyRepository.save(company);
-        companySearchRepository.save(result);
+        Company result = companyService.save(company);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("company", company.getId().toString()))
             .body(result);
@@ -93,8 +82,7 @@ public class CompanyResource {
     @Timed
     public List<Company> getAllCompanies() {
         log.debug("REST request to get all Companies");
-        List<Company> companies = companyRepository.findAll();
-        return companies;
+        return companyService.findAll();
     }
 
     /**
@@ -107,7 +95,7 @@ public class CompanyResource {
     @Timed
     public ResponseEntity<Company> getCompany(@PathVariable Long id) {
         log.debug("REST request to get Company : {}", id);
-        Company company = companyRepository.findOne(id);
+        Company company = companyService.findOne(id);
         return Optional.ofNullable(company)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -125,26 +113,8 @@ public class CompanyResource {
     @Timed
     public ResponseEntity<Void> deleteCompany(@PathVariable Long id) {
         log.debug("REST request to delete Company : {}", id);
-        companyRepository.delete(id);
-        companySearchRepository.delete(id);
+        companyService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("company", id.toString())).build();
     }
-
-    /**
-     * SEARCH  /_search/companies?query=:query : search for the company corresponding
-     * to the query.
-     *
-     * @param query the query of the company search 
-     * @return the result of the search
-     */
-    @GetMapping("/_search/companies")
-    @Timed
-    public List<Company> searchCompanies(@RequestParam String query) {
-        log.debug("REST request to search Companies for query {}", query);
-        return StreamSupport
-            .stream(companySearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .collect(Collectors.toList());
-    }
-
 
 }

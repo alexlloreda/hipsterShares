@@ -2,9 +2,7 @@ package io.alex.hipstershares.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.alex.hipstershares.domain.Portfolio;
-
-import io.alex.hipstershares.repository.PortfolioRepository;
-import io.alex.hipstershares.repository.search.PortfolioSearchRepository;
+import io.alex.hipstershares.service.PortfolioService;
 import io.alex.hipstershares.web.rest.util.HeaderUtil;
 
 import org.slf4j.Logger;
@@ -19,10 +17,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing Portfolio.
@@ -34,10 +28,7 @@ public class PortfolioResource {
     private final Logger log = LoggerFactory.getLogger(PortfolioResource.class);
         
     @Inject
-    private PortfolioRepository portfolioRepository;
-
-    @Inject
-    private PortfolioSearchRepository portfolioSearchRepository;
+    private PortfolioService portfolioService;
 
     /**
      * POST  /portfolios : Create a new portfolio.
@@ -53,8 +44,7 @@ public class PortfolioResource {
         if (portfolio.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("portfolio", "idexists", "A new portfolio cannot already have an ID")).body(null);
         }
-        Portfolio result = portfolioRepository.save(portfolio);
-        portfolioSearchRepository.save(result);
+        Portfolio result = portfolioService.save(portfolio);
         return ResponseEntity.created(new URI("/api/portfolios/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("portfolio", result.getId().toString()))
             .body(result);
@@ -76,8 +66,7 @@ public class PortfolioResource {
         if (portfolio.getId() == null) {
             return createPortfolio(portfolio);
         }
-        Portfolio result = portfolioRepository.save(portfolio);
-        portfolioSearchRepository.save(result);
+        Portfolio result = portfolioService.save(portfolio);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("portfolio", portfolio.getId().toString()))
             .body(result);
@@ -92,8 +81,7 @@ public class PortfolioResource {
     @Timed
     public List<Portfolio> getAllPortfolios() {
         log.debug("REST request to get all Portfolios");
-        List<Portfolio> portfolios = portfolioRepository.findAll();
-        return portfolios;
+        return portfolioService.findAll();
     }
 
     /**
@@ -106,7 +94,7 @@ public class PortfolioResource {
     @Timed
     public ResponseEntity<Portfolio> getPortfolio(@PathVariable Long id) {
         log.debug("REST request to get Portfolio : {}", id);
-        Portfolio portfolio = portfolioRepository.findOne(id);
+        Portfolio portfolio = portfolioService.findOne(id);
         return Optional.ofNullable(portfolio)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -124,26 +112,8 @@ public class PortfolioResource {
     @Timed
     public ResponseEntity<Void> deletePortfolio(@PathVariable Long id) {
         log.debug("REST request to delete Portfolio : {}", id);
-        portfolioRepository.delete(id);
-        portfolioSearchRepository.delete(id);
+        portfolioService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("portfolio", id.toString())).build();
     }
-
-    /**
-     * SEARCH  /_search/portfolios?query=:query : search for the portfolio corresponding
-     * to the query.
-     *
-     * @param query the query of the portfolio search 
-     * @return the result of the search
-     */
-    @GetMapping("/_search/portfolios")
-    @Timed
-    public List<Portfolio> searchPortfolios(@RequestParam String query) {
-        log.debug("REST request to search Portfolios for query {}", query);
-        return StreamSupport
-            .stream(portfolioSearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .collect(Collectors.toList());
-    }
-
 
 }

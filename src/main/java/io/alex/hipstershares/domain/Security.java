@@ -1,6 +1,5 @@
 package io.alex.hipstershares.domain;
 
-import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -15,7 +14,6 @@ import io.alex.hipstershares.domain.enumeration.Currency;
  */
 @Entity
 @Table(name = "security")
-@Document(indexName = "security")
 public class Security implements Serializable {
 
     private static final long serialVersionUID = 1L;

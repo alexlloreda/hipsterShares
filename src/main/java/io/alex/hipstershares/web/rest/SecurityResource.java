@@ -2,9 +2,7 @@ package io.alex.hipstershares.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.alex.hipstershares.domain.Security;
-
-import io.alex.hipstershares.repository.SecurityRepository;
-import io.alex.hipstershares.repository.search.SecuritySearchRepository;
+import io.alex.hipstershares.service.SecurityService;
 import io.alex.hipstershares.web.rest.util.HeaderUtil;
 
 import org.slf4j.Logger;
@@ -20,10 +18,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing Security.
@@ -35,10 +29,7 @@ public class SecurityResource {
     private final Logger log = LoggerFactory.getLogger(SecurityResource.class);
         
     @Inject
-    private SecurityRepository securityRepository;
-
-    @Inject
-    private SecuritySearchRepository securitySearchRepository;
+    private SecurityService securityService;
 
     /**
      * POST  /securities : Create a new security.
@@ -54,8 +45,7 @@ public class SecurityResource {
         if (security.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("security", "idexists", "A new security cannot already have an ID")).body(null);
         }
-        Security result = securityRepository.save(security);
-        securitySearchRepository.save(result);
+        Security result = securityService.save(security);
         return ResponseEntity.created(new URI("/api/securities/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("security", result.getId().toString()))
             .body(result);
@@ -77,8 +67,7 @@ public class SecurityResource {
         if (security.getId() == null) {
             return createSecurity(security);
         }
-        Security result = securityRepository.save(security);
-        securitySearchRepository.save(result);
+        Security result = securityService.save(security);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("security", security.getId().toString()))
             .body(result);
@@ -93,8 +82,7 @@ public class SecurityResource {
     @Timed
     public List<Security> getAllSecurities() {
         log.debug("REST request to get all Securities");
-        List<Security> securities = securityRepository.findAll();
-        return securities;
+        return securityService.findAll();
     }
 
     /**
@@ -107,7 +95,7 @@ public class SecurityResource {
     @Timed
     public ResponseEntity<Security> getSecurity(@PathVariable Long id) {
         log.debug("REST request to get Security : {}", id);
-        Security security = securityRepository.findOne(id);
+        Security security = securityService.findOne(id);
         return Optional.ofNullable(security)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -125,26 +113,8 @@ public class SecurityResource {
     @Timed
     public ResponseEntity<Void> deleteSecurity(@PathVariable Long id) {
         log.debug("REST request to delete Security : {}", id);
-        securityRepository.delete(id);
-        securitySearchRepository.delete(id);
+        securityService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("security", id.toString())).build();
     }
-
-    /**
-     * SEARCH  /_search/securities?query=:query : search for the security corresponding
-     * to the query.
-     *
-     * @param query the query of the security search 
-     * @return the result of the search
-     */
-    @GetMapping("/_search/securities")
-    @Timed
-    public List<Security> searchSecurities(@RequestParam String query) {
-        log.debug("REST request to search Securities for query {}", query);
-        return StreamSupport
-            .stream(securitySearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .collect(Collectors.toList());
-    }
-
 
 }

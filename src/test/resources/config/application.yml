@@ -37,14 +37,6 @@ spring:
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: true
             hibernate.hbm2ddl.auto: validate
-    data:
-        elasticsearch:
-            cluster-name:
-            cluster-nodes:
-            properties:
-                path:
-                  logs: target/elasticsearch/log
-                  data: target/elasticsearch/data
     mail:
         host: localhost
     mvc:
@@ -74,11 +66,9 @@ jhipster:
         maxPoolSize: 50
         queueCapacity: 10000
     security:
-        authentication:
-            jwt:
-                secret: ea1492fde7f8bda65f45f11f414027be1c922584
-                # Token is valid 24 hours
-                tokenValidityInSeconds: 86400
+        rememberMe:
+            # security key (this key should be unique for your application, and kept secret)
+            key: ea1492fde7f8bda65f45f11f414027be1c922584
     metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
         jmx.enabled: true
     swagger:

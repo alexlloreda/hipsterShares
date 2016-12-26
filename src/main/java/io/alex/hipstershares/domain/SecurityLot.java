@@ -1,6 +1,5 @@
 package io.alex.hipstershares.domain;
 
-import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -13,7 +12,6 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "security_lot")
-@Document(indexName = "securitylot")
 public class SecurityLot implements Serializable {
 
     private static final long serialVersionUID = 1L;

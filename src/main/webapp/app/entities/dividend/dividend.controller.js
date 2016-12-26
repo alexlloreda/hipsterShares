@@ -5,15 +5,12 @@
         .module('hipsterSharesApp')
         .controller('DividendController', DividendController);
 
-    DividendController.$inject = ['$scope', '$state', 'Dividend', 'DividendSearch'];
+    DividendController.$inject = ['$scope', '$state', 'Dividend'];
 
-    function DividendController ($scope, $state, Dividend, DividendSearch) {
+    function DividendController ($scope, $state, Dividend) {
         var vm = this;
 
         vm.dividends = [];
-        vm.clear = clear;
-        vm.search = search;
-        vm.loadAll = loadAll;
 
         loadAll();
 
@@ -23,19 +20,5 @@
                 vm.searchQuery = null;
             });
         }
-
-        function search() {
-            if (!vm.searchQuery) {
-                return vm.loadAll();
-            }
-            DividendSearch.query({query: vm.searchQuery}, function(result) {
-                vm.dividends = result;
-                vm.currentSearch = vm.searchQuery;
-            });
-        }
-
-        function clear() {
-            vm.searchQuery = null;
-            loadAll();
-        }    }
+    }
 })();

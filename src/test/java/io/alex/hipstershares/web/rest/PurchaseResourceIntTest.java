@@ -4,7 +4,7 @@ import io.alex.hipstershares.HipsterSharesApp;
 
 import io.alex.hipstershares.domain.Purchase;
 import io.alex.hipstershares.repository.PurchaseRepository;
-import io.alex.hipstershares.repository.search.PurchaseSearchRepository;
+import io.alex.hipstershares.service.PurchaseService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +50,7 @@ public class PurchaseResourceIntTest {
     private PurchaseRepository purchaseRepository;
 
     @Inject
-    private PurchaseSearchRepository purchaseSearchRepository;
+    private PurchaseService purchaseService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -69,8 +69,7 @@ public class PurchaseResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         PurchaseResource purchaseResource = new PurchaseResource();
-        ReflectionTestUtils.setField(purchaseResource, "purchaseSearchRepository", purchaseSearchRepository);
-        ReflectionTestUtils.setField(purchaseResource, "purchaseRepository", purchaseRepository);
+        ReflectionTestUtils.setField(purchaseResource, "purchaseService", purchaseService);
         this.restPurchaseMockMvc = MockMvcBuilders.standaloneSetup(purchaseResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -91,7 +90,6 @@ public class PurchaseResourceIntTest {
 
     @Before
     public void initTest() {
-        purchaseSearchRepository.deleteAll();
         purchase = createEntity(em);
     }
 
@@ -113,10 +111,6 @@ public class PurchaseResourceIntTest {
         Purchase testPurchase = purchaseList.get(purchaseList.size() - 1);
         assertThat(testPurchase.getUnits()).isEqualTo(DEFAULT_UNITS);
         assertThat(testPurchase.getLocalDate()).isEqualTo(DEFAULT_LOCAL_DATE);
-
-        // Validate the Purchase in ElasticSearch
-        Purchase purchaseEs = purchaseSearchRepository.findOne(testPurchase.getId());
-        assertThat(purchaseEs).isEqualToComparingFieldByField(testPurchase);
     }
 
     @Test
@@ -181,8 +175,8 @@ public class PurchaseResourceIntTest {
     @Transactional
     public void updatePurchase() throws Exception {
         // Initialize the database
-        purchaseRepository.saveAndFlush(purchase);
-        purchaseSearchRepository.save(purchase);
+        purchaseService.save(purchase);
+
         int databaseSizeBeforeUpdate = purchaseRepository.findAll().size();
 
         // Update the purchase
@@ -202,10 +196,6 @@ public class PurchaseResourceIntTest {
         Purchase testPurchase = purchaseList.get(purchaseList.size() - 1);
         assertThat(testPurchase.getUnits()).isEqualTo(UPDATED_UNITS);
         assertThat(testPurchase.getLocalDate()).isEqualTo(UPDATED_LOCAL_DATE);
-
-        // Validate the Purchase in ElasticSearch
-        Purchase purchaseEs = purchaseSearchRepository.findOne(testPurchase.getId());
-        assertThat(purchaseEs).isEqualToComparingFieldByField(testPurchase);
     }
 
     @Test
@@ -230,8 +220,8 @@ public class PurchaseResourceIntTest {
     @Transactional
     public void deletePurchase() throws Exception {
         // Initialize the database
-        purchaseRepository.saveAndFlush(purchase);
-        purchaseSearchRepository.save(purchase);
+        purchaseService.save(purchase);
+
         int databaseSizeBeforeDelete = purchaseRepository.findAll().size();
 
         // Get the purchase
@@ -239,28 +229,8 @@ public class PurchaseResourceIntTest {
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
-        // Validate ElasticSearch is empty
-        boolean purchaseExistsInEs = purchaseSearchRepository.exists(purchase.getId());
-        assertThat(purchaseExistsInEs).isFalse();
-
         // Validate the database is empty
         List<Purchase> purchaseList = purchaseRepository.findAll();
         assertThat(purchaseList).hasSize(databaseSizeBeforeDelete - 1);
-    }
-
-    @Test
-    @Transactional
-    public void searchPurchase() throws Exception {
-        // Initialize the database
-        purchaseRepository.saveAndFlush(purchase);
-        purchaseSearchRepository.save(purchase);
-
-        // Search the purchase
-        restPurchaseMockMvc.perform(get("/api/_search/purchases?query=id:" + purchase.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(purchase.getId().intValue())))
-            .andExpect(jsonPath("$.[*].units").value(hasItem(DEFAULT_UNITS)))
-            .andExpect(jsonPath("$.[*].localDate").value(hasItem(DEFAULT_LOCAL_DATE.toString())));
     }
 }

@@ -2,9 +2,7 @@ package io.alex.hipstershares.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.alex.hipstershares.domain.SecurityLot;
-
-import io.alex.hipstershares.repository.SecurityLotRepository;
-import io.alex.hipstershares.repository.search.SecurityLotSearchRepository;
+import io.alex.hipstershares.service.SecurityLotService;
 import io.alex.hipstershares.web.rest.util.HeaderUtil;
 
 import org.slf4j.Logger;
@@ -19,10 +17,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing SecurityLot.
@@ -34,10 +28,7 @@ public class SecurityLotResource {
     private final Logger log = LoggerFactory.getLogger(SecurityLotResource.class);
         
     @Inject
-    private SecurityLotRepository securityLotRepository;
-
-    @Inject
-    private SecurityLotSearchRepository securityLotSearchRepository;
+    private SecurityLotService securityLotService;
 
     /**
      * POST  /security-lots : Create a new securityLot.
@@ -53,8 +44,7 @@ public class SecurityLotResource {
         if (securityLot.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("securityLot", "idexists", "A new securityLot cannot already have an ID")).body(null);
         }
-        SecurityLot result = securityLotRepository.save(securityLot);
-        securityLotSearchRepository.save(result);
+        SecurityLot result = securityLotService.save(securityLot);
         return ResponseEntity.created(new URI("/api/security-lots/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("securityLot", result.getId().toString()))
             .body(result);
@@ -76,8 +66,7 @@ public class SecurityLotResource {
         if (securityLot.getId() == null) {
             return createSecurityLot(securityLot);
         }
-        SecurityLot result = securityLotRepository.save(securityLot);
-        securityLotSearchRepository.save(result);
+        SecurityLot result = securityLotService.save(securityLot);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("securityLot", securityLot.getId().toString()))
             .body(result);
@@ -92,8 +81,7 @@ public class SecurityLotResource {
     @Timed
     public List<SecurityLot> getAllSecurityLots() {
         log.debug("REST request to get all SecurityLots");
-        List<SecurityLot> securityLots = securityLotRepository.findAll();
-        return securityLots;
+        return securityLotService.findAll();
     }
 
     /**
@@ -106,7 +94,7 @@ public class SecurityLotResource {
     @Timed
     public ResponseEntity<SecurityLot> getSecurityLot(@PathVariable Long id) {
         log.debug("REST request to get SecurityLot : {}", id);
-        SecurityLot securityLot = securityLotRepository.findOne(id);
+        SecurityLot securityLot = securityLotService.findOne(id);
         return Optional.ofNullable(securityLot)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -124,26 +112,8 @@ public class SecurityLotResource {
     @Timed
     public ResponseEntity<Void> deleteSecurityLot(@PathVariable Long id) {
         log.debug("REST request to delete SecurityLot : {}", id);
-        securityLotRepository.delete(id);
-        securityLotSearchRepository.delete(id);
+        securityLotService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("securityLot", id.toString())).build();
     }
-
-    /**
-     * SEARCH  /_search/security-lots?query=:query : search for the securityLot corresponding
-     * to the query.
-     *
-     * @param query the query of the securityLot search 
-     * @return the result of the search
-     */
-    @GetMapping("/_search/security-lots")
-    @Timed
-    public List<SecurityLot> searchSecurityLots(@RequestParam String query) {
-        log.debug("REST request to search SecurityLots for query {}", query);
-        return StreamSupport
-            .stream(securityLotSearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .collect(Collectors.toList());
-    }
-
 
 }

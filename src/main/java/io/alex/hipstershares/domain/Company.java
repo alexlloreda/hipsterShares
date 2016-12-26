@@ -1,7 +1,6 @@
 package io.alex.hipstershares.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -15,7 +14,6 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "company")
-@Document(indexName = "company")
 public class Company implements Serializable {
 
     private static final long serialVersionUID = 1L;

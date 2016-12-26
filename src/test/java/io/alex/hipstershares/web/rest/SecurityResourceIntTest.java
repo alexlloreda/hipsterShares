@@ -4,7 +4,7 @@ import io.alex.hipstershares.HipsterSharesApp;
 
 import io.alex.hipstershares.domain.Security;
 import io.alex.hipstershares.repository.SecurityRepository;
-import io.alex.hipstershares.repository.search.SecuritySearchRepository;
+import io.alex.hipstershares.service.SecurityService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +56,7 @@ public class SecurityResourceIntTest {
     private SecurityRepository securityRepository;
 
     @Inject
-    private SecuritySearchRepository securitySearchRepository;
+    private SecurityService securityService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -75,8 +75,7 @@ public class SecurityResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         SecurityResource securityResource = new SecurityResource();
-        ReflectionTestUtils.setField(securityResource, "securitySearchRepository", securitySearchRepository);
-        ReflectionTestUtils.setField(securityResource, "securityRepository", securityRepository);
+        ReflectionTestUtils.setField(securityResource, "securityService", securityService);
         this.restSecurityMockMvc = MockMvcBuilders.standaloneSetup(securityResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -99,7 +98,6 @@ public class SecurityResourceIntTest {
 
     @Before
     public void initTest() {
-        securitySearchRepository.deleteAll();
         security = createEntity(em);
     }
 
@@ -123,10 +121,6 @@ public class SecurityResourceIntTest {
         assertThat(testSecurity.getIssuedUnits()).isEqualTo(DEFAULT_ISSUED_UNITS);
         assertThat(testSecurity.getSpotPrice()).isEqualTo(DEFAULT_SPOT_PRICE);
         assertThat(testSecurity.getCurrency()).isEqualTo(DEFAULT_CURRENCY);
-
-        // Validate the Security in ElasticSearch
-        Security securityEs = securitySearchRepository.findOne(testSecurity.getId());
-        assertThat(securityEs).isEqualToComparingFieldByField(testSecurity);
     }
 
     @Test
@@ -213,8 +207,8 @@ public class SecurityResourceIntTest {
     @Transactional
     public void updateSecurity() throws Exception {
         // Initialize the database
-        securityRepository.saveAndFlush(security);
-        securitySearchRepository.save(security);
+        securityService.save(security);
+
         int databaseSizeBeforeUpdate = securityRepository.findAll().size();
 
         // Update the security
@@ -238,10 +232,6 @@ public class SecurityResourceIntTest {
         assertThat(testSecurity.getIssuedUnits()).isEqualTo(UPDATED_ISSUED_UNITS);
         assertThat(testSecurity.getSpotPrice()).isEqualTo(UPDATED_SPOT_PRICE);
         assertThat(testSecurity.getCurrency()).isEqualTo(UPDATED_CURRENCY);
-
-        // Validate the Security in ElasticSearch
-        Security securityEs = securitySearchRepository.findOne(testSecurity.getId());
-        assertThat(securityEs).isEqualToComparingFieldByField(testSecurity);
     }
 
     @Test
@@ -266,8 +256,8 @@ public class SecurityResourceIntTest {
     @Transactional
     public void deleteSecurity() throws Exception {
         // Initialize the database
-        securityRepository.saveAndFlush(security);
-        securitySearchRepository.save(security);
+        securityService.save(security);
+
         int databaseSizeBeforeDelete = securityRepository.findAll().size();
 
         // Get the security
@@ -275,30 +265,8 @@ public class SecurityResourceIntTest {
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
-        // Validate ElasticSearch is empty
-        boolean securityExistsInEs = securitySearchRepository.exists(security.getId());
-        assertThat(securityExistsInEs).isFalse();
-
         // Validate the database is empty
         List<Security> securityList = securityRepository.findAll();
         assertThat(securityList).hasSize(databaseSizeBeforeDelete - 1);
-    }
-
-    @Test
-    @Transactional
-    public void searchSecurity() throws Exception {
-        // Initialize the database
-        securityRepository.saveAndFlush(security);
-        securitySearchRepository.save(security);
-
-        // Search the security
-        restSecurityMockMvc.perform(get("/api/_search/securities?query=id:" + security.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(security.getId().intValue())))
-            .andExpect(jsonPath("$.[*].ticker").value(hasItem(DEFAULT_TICKER.toString())))
-            .andExpect(jsonPath("$.[*].issuedUnits").value(hasItem(DEFAULT_ISSUED_UNITS.intValue())))
-            .andExpect(jsonPath("$.[*].spotPrice").value(hasItem(DEFAULT_SPOT_PRICE.intValue())))
-            .andExpect(jsonPath("$.[*].currency").value(hasItem(DEFAULT_CURRENCY.toString())));
     }
 }

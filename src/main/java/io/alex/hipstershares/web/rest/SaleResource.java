@@ -2,9 +2,7 @@ package io.alex.hipstershares.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.alex.hipstershares.domain.Sale;
-
-import io.alex.hipstershares.repository.SaleRepository;
-import io.alex.hipstershares.repository.search.SaleSearchRepository;
+import io.alex.hipstershares.service.SaleService;
 import io.alex.hipstershares.web.rest.util.HeaderUtil;
 
 import org.slf4j.Logger;
@@ -19,10 +17,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing Sale.
@@ -34,10 +28,7 @@ public class SaleResource {
     private final Logger log = LoggerFactory.getLogger(SaleResource.class);
         
     @Inject
-    private SaleRepository saleRepository;
-
-    @Inject
-    private SaleSearchRepository saleSearchRepository;
+    private SaleService saleService;
 
     /**
      * POST  /sales : Create a new sale.
@@ -53,8 +44,7 @@ public class SaleResource {
         if (sale.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("sale", "idexists", "A new sale cannot already have an ID")).body(null);
         }
-        Sale result = saleRepository.save(sale);
-        saleSearchRepository.save(result);
+        Sale result = saleService.save(sale);
         return ResponseEntity.created(new URI("/api/sales/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("sale", result.getId().toString()))
             .body(result);
@@ -76,8 +66,7 @@ public class SaleResource {
         if (sale.getId() == null) {
             return createSale(sale);
         }
-        Sale result = saleRepository.save(sale);
-        saleSearchRepository.save(result);
+        Sale result = saleService.save(sale);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("sale", sale.getId().toString()))
             .body(result);
@@ -92,8 +81,7 @@ public class SaleResource {
     @Timed
     public List<Sale> getAllSales() {
         log.debug("REST request to get all Sales");
-        List<Sale> sales = saleRepository.findAll();
-        return sales;
+        return saleService.findAll();
     }
 
     /**
@@ -106,7 +94,7 @@ public class SaleResource {
     @Timed
     public ResponseEntity<Sale> getSale(@PathVariable Long id) {
         log.debug("REST request to get Sale : {}", id);
-        Sale sale = saleRepository.findOne(id);
+        Sale sale = saleService.findOne(id);
         return Optional.ofNullable(sale)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -124,26 +112,8 @@ public class SaleResource {
     @Timed
     public ResponseEntity<Void> deleteSale(@PathVariable Long id) {
         log.debug("REST request to delete Sale : {}", id);
-        saleRepository.delete(id);
-        saleSearchRepository.delete(id);
+        saleService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("sale", id.toString())).build();
     }
-
-    /**
-     * SEARCH  /_search/sales?query=:query : search for the sale corresponding
-     * to the query.
-     *
-     * @param query the query of the sale search 
-     * @return the result of the search
-     */
-    @GetMapping("/_search/sales")
-    @Timed
-    public List<Sale> searchSales(@RequestParam String query) {
-        log.debug("REST request to search Sales for query {}", query);
-        return StreamSupport
-            .stream(saleSearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .collect(Collectors.toList());
-    }
-
 
 }

@@ -31,10 +31,6 @@ spring:
             hibernate.cache.use_second_level_cache: false
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: false
-    data:
-        elasticsearch:
-            cluster-name:
-            cluster-nodes: localhost:9300
     mail:
         host: localhost
         port: 25
@@ -62,11 +58,9 @@ jhipster:
         cache: # Used by the CachingHttpHeadersFilter
             timeToLiveInDays: 1461
     security:
-        authentication:
-            jwt:
-                secret: ea1492fde7f8bda65f45f11f414027be1c922584
-                # Token is valid 24 hours
-                tokenValidityInSeconds: 86400
+        rememberMe:
+            # security key (this key should be unique for your application, and kept secret)
+            key: ea1492fde7f8bda65f45f11f414027be1c922584
     mail: # specific JHipster mail property, for standard properties see MailProperties
         from: hipsterShares@localhost
         baseUrl: http://my-server-url-to-change # Modify according to your server's URL

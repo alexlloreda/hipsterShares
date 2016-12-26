@@ -2,9 +2,7 @@ package io.alex.hipstershares.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.alex.hipstershares.domain.Dividend;
-
-import io.alex.hipstershares.repository.DividendRepository;
-import io.alex.hipstershares.repository.search.DividendSearchRepository;
+import io.alex.hipstershares.service.DividendService;
 import io.alex.hipstershares.web.rest.util.HeaderUtil;
 
 import org.slf4j.Logger;
@@ -19,10 +17,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing Dividend.
@@ -34,10 +28,7 @@ public class DividendResource {
     private final Logger log = LoggerFactory.getLogger(DividendResource.class);
         
     @Inject
-    private DividendRepository dividendRepository;
-
-    @Inject
-    private DividendSearchRepository dividendSearchRepository;
+    private DividendService dividendService;
 
     /**
      * POST  /dividends : Create a new dividend.
@@ -53,8 +44,7 @@ public class DividendResource {
         if (dividend.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("dividend", "idexists", "A new dividend cannot already have an ID")).body(null);
         }
-        Dividend result = dividendRepository.save(dividend);
-        dividendSearchRepository.save(result);
+        Dividend result = dividendService.save(dividend);
         return ResponseEntity.created(new URI("/api/dividends/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("dividend", result.getId().toString()))
             .body(result);
@@ -76,8 +66,7 @@ public class DividendResource {
         if (dividend.getId() == null) {
             return createDividend(dividend);
         }
-        Dividend result = dividendRepository.save(dividend);
-        dividendSearchRepository.save(result);
+        Dividend result = dividendService.save(dividend);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("dividend", dividend.getId().toString()))
             .body(result);
@@ -92,8 +81,7 @@ public class DividendResource {
     @Timed
     public List<Dividend> getAllDividends() {
         log.debug("REST request to get all Dividends");
-        List<Dividend> dividends = dividendRepository.findAll();
-        return dividends;
+        return dividendService.findAll();
     }
 
     /**
@@ -106,7 +94,7 @@ public class DividendResource {
     @Timed
     public ResponseEntity<Dividend> getDividend(@PathVariable Long id) {
         log.debug("REST request to get Dividend : {}", id);
-        Dividend dividend = dividendRepository.findOne(id);
+        Dividend dividend = dividendService.findOne(id);
         return Optional.ofNullable(dividend)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -124,26 +112,8 @@ public class DividendResource {
     @Timed
     public ResponseEntity<Void> deleteDividend(@PathVariable Long id) {
         log.debug("REST request to delete Dividend : {}", id);
-        dividendRepository.delete(id);
-        dividendSearchRepository.delete(id);
+        dividendService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("dividend", id.toString())).build();
     }
-
-    /**
-     * SEARCH  /_search/dividends?query=:query : search for the dividend corresponding
-     * to the query.
-     *
-     * @param query the query of the dividend search 
-     * @return the result of the search
-     */
-    @GetMapping("/_search/dividends")
-    @Timed
-    public List<Dividend> searchDividends(@RequestParam String query) {
-        log.debug("REST request to search Dividends for query {}", query);
-        return StreamSupport
-            .stream(dividendSearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .collect(Collectors.toList());
-    }
-
 
 }

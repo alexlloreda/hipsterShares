@@ -4,7 +4,7 @@ import io.alex.hipstershares.HipsterSharesApp;
 
 import io.alex.hipstershares.domain.SecurityLot;
 import io.alex.hipstershares.repository.SecurityLotRepository;
-import io.alex.hipstershares.repository.search.SecurityLotSearchRepository;
+import io.alex.hipstershares.service.SecurityLotService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class SecurityLotResourceIntTest {
     private SecurityLotRepository securityLotRepository;
 
     @Inject
-    private SecurityLotSearchRepository securityLotSearchRepository;
+    private SecurityLotService securityLotService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -79,8 +79,7 @@ public class SecurityLotResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         SecurityLotResource securityLotResource = new SecurityLotResource();
-        ReflectionTestUtils.setField(securityLotResource, "securityLotSearchRepository", securityLotSearchRepository);
-        ReflectionTestUtils.setField(securityLotResource, "securityLotRepository", securityLotRepository);
+        ReflectionTestUtils.setField(securityLotResource, "securityLotService", securityLotService);
         this.restSecurityLotMockMvc = MockMvcBuilders.standaloneSetup(securityLotResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -104,7 +103,6 @@ public class SecurityLotResourceIntTest {
 
     @Before
     public void initTest() {
-        securityLotSearchRepository.deleteAll();
         securityLot = createEntity(em);
     }
 
@@ -129,10 +127,6 @@ public class SecurityLotResourceIntTest {
         assertThat(testSecurityLot.getSellLocalDate()).isEqualTo(DEFAULT_SELL_LOCAL_DATE);
         assertThat(testSecurityLot.getSellPrice()).isEqualTo(DEFAULT_SELL_PRICE);
         assertThat(testSecurityLot.getUnits()).isEqualTo(DEFAULT_UNITS);
-
-        // Validate the SecurityLot in ElasticSearch
-        SecurityLot securityLotEs = securityLotSearchRepository.findOne(testSecurityLot.getId());
-        assertThat(securityLotEs).isEqualToComparingFieldByField(testSecurityLot);
     }
 
     @Test
@@ -203,8 +197,8 @@ public class SecurityLotResourceIntTest {
     @Transactional
     public void updateSecurityLot() throws Exception {
         // Initialize the database
-        securityLotRepository.saveAndFlush(securityLot);
-        securityLotSearchRepository.save(securityLot);
+        securityLotService.save(securityLot);
+
         int databaseSizeBeforeUpdate = securityLotRepository.findAll().size();
 
         // Update the securityLot
@@ -230,10 +224,6 @@ public class SecurityLotResourceIntTest {
         assertThat(testSecurityLot.getSellLocalDate()).isEqualTo(UPDATED_SELL_LOCAL_DATE);
         assertThat(testSecurityLot.getSellPrice()).isEqualTo(UPDATED_SELL_PRICE);
         assertThat(testSecurityLot.getUnits()).isEqualTo(UPDATED_UNITS);
-
-        // Validate the SecurityLot in ElasticSearch
-        SecurityLot securityLotEs = securityLotSearchRepository.findOne(testSecurityLot.getId());
-        assertThat(securityLotEs).isEqualToComparingFieldByField(testSecurityLot);
     }
 
     @Test
@@ -258,8 +248,8 @@ public class SecurityLotResourceIntTest {
     @Transactional
     public void deleteSecurityLot() throws Exception {
         // Initialize the database
-        securityLotRepository.saveAndFlush(securityLot);
-        securityLotSearchRepository.save(securityLot);
+        securityLotService.save(securityLot);
+
         int databaseSizeBeforeDelete = securityLotRepository.findAll().size();
 
         // Get the securityLot
@@ -267,31 +257,8 @@ public class SecurityLotResourceIntTest {
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
-        // Validate ElasticSearch is empty
-        boolean securityLotExistsInEs = securityLotSearchRepository.exists(securityLot.getId());
-        assertThat(securityLotExistsInEs).isFalse();
-
         // Validate the database is empty
         List<SecurityLot> securityLotList = securityLotRepository.findAll();
         assertThat(securityLotList).hasSize(databaseSizeBeforeDelete - 1);
-    }
-
-    @Test
-    @Transactional
-    public void searchSecurityLot() throws Exception {
-        // Initialize the database
-        securityLotRepository.saveAndFlush(securityLot);
-        securityLotSearchRepository.save(securityLot);
-
-        // Search the securityLot
-        restSecurityLotMockMvc.perform(get("/api/_search/security-lots?query=id:" + securityLot.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(securityLot.getId().intValue())))
-            .andExpect(jsonPath("$.[*].purchasePrice").value(hasItem(DEFAULT_PURCHASE_PRICE.intValue())))
-            .andExpect(jsonPath("$.[*].purchaseLocalDate").value(hasItem(DEFAULT_PURCHASE_LOCAL_DATE.toString())))
-            .andExpect(jsonPath("$.[*].sellLocalDate").value(hasItem(DEFAULT_SELL_LOCAL_DATE.toString())))
-            .andExpect(jsonPath("$.[*].sellPrice").value(hasItem(DEFAULT_SELL_PRICE.intValue())))
-            .andExpect(jsonPath("$.[*].units").value(hasItem(DEFAULT_UNITS)));
     }
 }

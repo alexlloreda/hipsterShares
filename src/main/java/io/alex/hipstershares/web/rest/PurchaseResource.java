@@ -2,9 +2,7 @@ package io.alex.hipstershares.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.alex.hipstershares.domain.Purchase;
-
-import io.alex.hipstershares.repository.PurchaseRepository;
-import io.alex.hipstershares.repository.search.PurchaseSearchRepository;
+import io.alex.hipstershares.service.PurchaseService;
 import io.alex.hipstershares.web.rest.util.HeaderUtil;
 
 import org.slf4j.Logger;
@@ -19,10 +17,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing Purchase.
@@ -34,10 +28,7 @@ public class PurchaseResource {
     private final Logger log = LoggerFactory.getLogger(PurchaseResource.class);
         
     @Inject
-    private PurchaseRepository purchaseRepository;
-
-    @Inject
-    private PurchaseSearchRepository purchaseSearchRepository;
+    private PurchaseService purchaseService;
 
     /**
      * POST  /purchases : Create a new purchase.
@@ -53,8 +44,7 @@ public class PurchaseResource {
         if (purchase.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("purchase", "idexists", "A new purchase cannot already have an ID")).body(null);
         }
-        Purchase result = purchaseRepository.save(purchase);
-        purchaseSearchRepository.save(result);
+        Purchase result = purchaseService.save(purchase);
         return ResponseEntity.created(new URI("/api/purchases/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("purchase", result.getId().toString()))
             .body(result);
@@ -76,8 +66,7 @@ public class PurchaseResource {
         if (purchase.getId() == null) {
             return createPurchase(purchase);
         }
-        Purchase result = purchaseRepository.save(purchase);
-        purchaseSearchRepository.save(result);
+        Purchase result = purchaseService.save(purchase);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("purchase", purchase.getId().toString()))
             .body(result);
@@ -92,8 +81,7 @@ public class PurchaseResource {
     @Timed
     public List<Purchase> getAllPurchases() {
         log.debug("REST request to get all Purchases");
-        List<Purchase> purchases = purchaseRepository.findAll();
-        return purchases;
+        return purchaseService.findAll();
     }
 
     /**
@@ -106,7 +94,7 @@ public class PurchaseResource {
     @Timed
     public ResponseEntity<Purchase> getPurchase(@PathVariable Long id) {
         log.debug("REST request to get Purchase : {}", id);
-        Purchase purchase = purchaseRepository.findOne(id);
+        Purchase purchase = purchaseService.findOne(id);
         return Optional.ofNullable(purchase)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -124,26 +112,8 @@ public class PurchaseResource {
     @Timed
     public ResponseEntity<Void> deletePurchase(@PathVariable Long id) {
         log.debug("REST request to delete Purchase : {}", id);
-        purchaseRepository.delete(id);
-        purchaseSearchRepository.delete(id);
+        purchaseService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("purchase", id.toString())).build();
     }
-
-    /**
-     * SEARCH  /_search/purchases?query=:query : search for the purchase corresponding
-     * to the query.
-     *
-     * @param query the query of the purchase search 
-     * @return the result of the search
-     */
-    @GetMapping("/_search/purchases")
-    @Timed
-    public List<Purchase> searchPurchases(@RequestParam String query) {
-        log.debug("REST request to search Purchases for query {}", query);
-        return StreamSupport
-            .stream(purchaseSearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .collect(Collectors.toList());
-    }
-
 
 }

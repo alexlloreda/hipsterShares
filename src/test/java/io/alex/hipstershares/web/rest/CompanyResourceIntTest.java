@@ -4,7 +4,7 @@ import io.alex.hipstershares.HipsterSharesApp;
 
 import io.alex.hipstershares.domain.Company;
 import io.alex.hipstershares.repository.CompanyRepository;
-import io.alex.hipstershares.repository.search.CompanySearchRepository;
+import io.alex.hipstershares.service.CompanyService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class CompanyResourceIntTest {
     private CompanyRepository companyRepository;
 
     @Inject
-    private CompanySearchRepository companySearchRepository;
+    private CompanyService companyService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -64,8 +64,7 @@ public class CompanyResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         CompanyResource companyResource = new CompanyResource();
-        ReflectionTestUtils.setField(companyResource, "companySearchRepository", companySearchRepository);
-        ReflectionTestUtils.setField(companyResource, "companyRepository", companyRepository);
+        ReflectionTestUtils.setField(companyResource, "companyService", companyService);
         this.restCompanyMockMvc = MockMvcBuilders.standaloneSetup(companyResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -85,7 +84,6 @@ public class CompanyResourceIntTest {
 
     @Before
     public void initTest() {
-        companySearchRepository.deleteAll();
         company = createEntity(em);
     }
 
@@ -106,10 +104,6 @@ public class CompanyResourceIntTest {
         assertThat(companyList).hasSize(databaseSizeBeforeCreate + 1);
         Company testCompany = companyList.get(companyList.size() - 1);
         assertThat(testCompany.getName()).isEqualTo(DEFAULT_NAME);
-
-        // Validate the Company in ElasticSearch
-        Company companyEs = companySearchRepository.findOne(testCompany.getId());
-        assertThat(companyEs).isEqualToComparingFieldByField(testCompany);
     }
 
     @Test
@@ -190,8 +184,8 @@ public class CompanyResourceIntTest {
     @Transactional
     public void updateCompany() throws Exception {
         // Initialize the database
-        companyRepository.saveAndFlush(company);
-        companySearchRepository.save(company);
+        companyService.save(company);
+
         int databaseSizeBeforeUpdate = companyRepository.findAll().size();
 
         // Update the company
@@ -209,10 +203,6 @@ public class CompanyResourceIntTest {
         assertThat(companyList).hasSize(databaseSizeBeforeUpdate);
         Company testCompany = companyList.get(companyList.size() - 1);
         assertThat(testCompany.getName()).isEqualTo(UPDATED_NAME);
-
-        // Validate the Company in ElasticSearch
-        Company companyEs = companySearchRepository.findOne(testCompany.getId());
-        assertThat(companyEs).isEqualToComparingFieldByField(testCompany);
     }
 
     @Test
@@ -237,8 +227,8 @@ public class CompanyResourceIntTest {
     @Transactional
     public void deleteCompany() throws Exception {
         // Initialize the database
-        companyRepository.saveAndFlush(company);
-        companySearchRepository.save(company);
+        companyService.save(company);
+
         int databaseSizeBeforeDelete = companyRepository.findAll().size();
 
         // Get the company
@@ -246,27 +236,8 @@ public class CompanyResourceIntTest {
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
-        // Validate ElasticSearch is empty
-        boolean companyExistsInEs = companySearchRepository.exists(company.getId());
-        assertThat(companyExistsInEs).isFalse();
-
         // Validate the database is empty
         List<Company> companyList = companyRepository.findAll();
         assertThat(companyList).hasSize(databaseSizeBeforeDelete - 1);
-    }
-
-    @Test
-    @Transactional
-    public void searchCompany() throws Exception {
-        // Initialize the database
-        companyRepository.saveAndFlush(company);
-        companySearchRepository.save(company);
-
-        // Search the company
-        restCompanyMockMvc.perform(get("/api/_search/companies?query=id:" + company.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(company.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
     }
 }

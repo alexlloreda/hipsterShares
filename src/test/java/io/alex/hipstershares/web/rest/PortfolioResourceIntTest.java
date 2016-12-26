@@ -4,7 +4,7 @@ import io.alex.hipstershares.HipsterSharesApp;
 
 import io.alex.hipstershares.domain.Portfolio;
 import io.alex.hipstershares.repository.PortfolioRepository;
-import io.alex.hipstershares.repository.search.PortfolioSearchRepository;
+import io.alex.hipstershares.service.PortfolioService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class PortfolioResourceIntTest {
     private PortfolioRepository portfolioRepository;
 
     @Inject
-    private PortfolioSearchRepository portfolioSearchRepository;
+    private PortfolioService portfolioService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -64,8 +64,7 @@ public class PortfolioResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         PortfolioResource portfolioResource = new PortfolioResource();
-        ReflectionTestUtils.setField(portfolioResource, "portfolioSearchRepository", portfolioSearchRepository);
-        ReflectionTestUtils.setField(portfolioResource, "portfolioRepository", portfolioRepository);
+        ReflectionTestUtils.setField(portfolioResource, "portfolioService", portfolioService);
         this.restPortfolioMockMvc = MockMvcBuilders.standaloneSetup(portfolioResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -85,7 +84,6 @@ public class PortfolioResourceIntTest {
 
     @Before
     public void initTest() {
-        portfolioSearchRepository.deleteAll();
         portfolio = createEntity(em);
     }
 
@@ -106,10 +104,6 @@ public class PortfolioResourceIntTest {
         assertThat(portfolioList).hasSize(databaseSizeBeforeCreate + 1);
         Portfolio testPortfolio = portfolioList.get(portfolioList.size() - 1);
         assertThat(testPortfolio.getName()).isEqualTo(DEFAULT_NAME);
-
-        // Validate the Portfolio in ElasticSearch
-        Portfolio portfolioEs = portfolioSearchRepository.findOne(testPortfolio.getId());
-        assertThat(portfolioEs).isEqualToComparingFieldByField(testPortfolio);
     }
 
     @Test
@@ -172,8 +166,8 @@ public class PortfolioResourceIntTest {
     @Transactional
     public void updatePortfolio() throws Exception {
         // Initialize the database
-        portfolioRepository.saveAndFlush(portfolio);
-        portfolioSearchRepository.save(portfolio);
+        portfolioService.save(portfolio);
+
         int databaseSizeBeforeUpdate = portfolioRepository.findAll().size();
 
         // Update the portfolio
@@ -191,10 +185,6 @@ public class PortfolioResourceIntTest {
         assertThat(portfolioList).hasSize(databaseSizeBeforeUpdate);
         Portfolio testPortfolio = portfolioList.get(portfolioList.size() - 1);
         assertThat(testPortfolio.getName()).isEqualTo(UPDATED_NAME);
-
-        // Validate the Portfolio in ElasticSearch
-        Portfolio portfolioEs = portfolioSearchRepository.findOne(testPortfolio.getId());
-        assertThat(portfolioEs).isEqualToComparingFieldByField(testPortfolio);
     }
 
     @Test
@@ -219,8 +209,8 @@ public class PortfolioResourceIntTest {
     @Transactional
     public void deletePortfolio() throws Exception {
         // Initialize the database
-        portfolioRepository.saveAndFlush(portfolio);
-        portfolioSearchRepository.save(portfolio);
+        portfolioService.save(portfolio);
+
         int databaseSizeBeforeDelete = portfolioRepository.findAll().size();
 
         // Get the portfolio
@@ -228,27 +218,8 @@ public class PortfolioResourceIntTest {
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
-        // Validate ElasticSearch is empty
-        boolean portfolioExistsInEs = portfolioSearchRepository.exists(portfolio.getId());
-        assertThat(portfolioExistsInEs).isFalse();
-
         // Validate the database is empty
         List<Portfolio> portfolioList = portfolioRepository.findAll();
         assertThat(portfolioList).hasSize(databaseSizeBeforeDelete - 1);
-    }
-
-    @Test
-    @Transactional
-    public void searchPortfolio() throws Exception {
-        // Initialize the database
-        portfolioRepository.saveAndFlush(portfolio);
-        portfolioSearchRepository.save(portfolio);
-
-        // Search the portfolio
-        restPortfolioMockMvc.perform(get("/api/_search/portfolios?query=id:" + portfolio.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(portfolio.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
     }
 }

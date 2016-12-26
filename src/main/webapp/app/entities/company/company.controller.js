@@ -5,15 +5,12 @@
         .module('hipsterSharesApp')
         .controller('CompanyController', CompanyController);
 
-    CompanyController.$inject = ['$scope', '$state', 'Company', 'CompanySearch'];
+    CompanyController.$inject = ['$scope', '$state', 'Company'];
 
-    function CompanyController ($scope, $state, Company, CompanySearch) {
+    function CompanyController ($scope, $state, Company) {
         var vm = this;
 
         vm.companies = [];
-        vm.clear = clear;
-        vm.search = search;
-        vm.loadAll = loadAll;
 
         loadAll();
 
@@ -23,19 +20,5 @@
                 vm.searchQuery = null;
             });
         }
-
-        function search() {
-            if (!vm.searchQuery) {
-                return vm.loadAll();
-            }
-            CompanySearch.query({query: vm.searchQuery}, function(result) {
-                vm.companies = result;
-                vm.currentSearch = vm.searchQuery;
-            });
-        }
-
-        function clear() {
-            vm.searchQuery = null;
-            loadAll();
-        }    }
+    }
 })();

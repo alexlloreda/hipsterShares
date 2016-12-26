@@ -5,15 +5,12 @@
         .module('hipsterSharesApp')
         .controller('SaleController', SaleController);
 
-    SaleController.$inject = ['$scope', '$state', 'Sale', 'SaleSearch'];
+    SaleController.$inject = ['$scope', '$state', 'Sale'];
 
-    function SaleController ($scope, $state, Sale, SaleSearch) {
+    function SaleController ($scope, $state, Sale) {
         var vm = this;
 
         vm.sales = [];
-        vm.clear = clear;
-        vm.search = search;
-        vm.loadAll = loadAll;
 
         loadAll();
 
@@ -23,19 +20,5 @@
                 vm.searchQuery = null;
             });
         }
-
-        function search() {
-            if (!vm.searchQuery) {
-                return vm.loadAll();
-            }
-            SaleSearch.query({query: vm.searchQuery}, function(result) {
-                vm.sales = result;
-                vm.currentSearch = vm.searchQuery;
-            });
-        }
-
-        function clear() {
-            vm.searchQuery = null;
-            loadAll();
-        }    }
+    }
 })();

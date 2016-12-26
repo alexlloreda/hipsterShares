@@ -4,7 +4,7 @@ import io.alex.hipstershares.HipsterSharesApp;
 
 import io.alex.hipstershares.domain.Dividend;
 import io.alex.hipstershares.repository.DividendRepository;
-import io.alex.hipstershares.repository.search.DividendSearchRepository;
+import io.alex.hipstershares.service.DividendService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class DividendResourceIntTest {
     private DividendRepository dividendRepository;
 
     @Inject
-    private DividendSearchRepository dividendSearchRepository;
+    private DividendService dividendService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -79,8 +79,7 @@ public class DividendResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         DividendResource dividendResource = new DividendResource();
-        ReflectionTestUtils.setField(dividendResource, "dividendSearchRepository", dividendSearchRepository);
-        ReflectionTestUtils.setField(dividendResource, "dividendRepository", dividendRepository);
+        ReflectionTestUtils.setField(dividendResource, "dividendService", dividendService);
         this.restDividendMockMvc = MockMvcBuilders.standaloneSetup(dividendResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -104,7 +103,6 @@ public class DividendResourceIntTest {
 
     @Before
     public void initTest() {
-        dividendSearchRepository.deleteAll();
         dividend = createEntity(em);
     }
 
@@ -129,10 +127,6 @@ public class DividendResourceIntTest {
         assertThat(testDividend.getPaymentLocalDate()).isEqualTo(DEFAULT_PAYMENT_LOCAL_DATE);
         assertThat(testDividend.getDps()).isEqualTo(DEFAULT_DPS);
         assertThat(testDividend.getFranking()).isEqualTo(DEFAULT_FRANKING);
-
-        // Validate the Dividend in ElasticSearch
-        Dividend dividendEs = dividendSearchRepository.findOne(testDividend.getId());
-        assertThat(dividendEs).isEqualToComparingFieldByField(testDividend);
     }
 
     @Test
@@ -203,8 +197,8 @@ public class DividendResourceIntTest {
     @Transactional
     public void updateDividend() throws Exception {
         // Initialize the database
-        dividendRepository.saveAndFlush(dividend);
-        dividendSearchRepository.save(dividend);
+        dividendService.save(dividend);
+
         int databaseSizeBeforeUpdate = dividendRepository.findAll().size();
 
         // Update the dividend
@@ -230,10 +224,6 @@ public class DividendResourceIntTest {
         assertThat(testDividend.getPaymentLocalDate()).isEqualTo(UPDATED_PAYMENT_LOCAL_DATE);
         assertThat(testDividend.getDps()).isEqualTo(UPDATED_DPS);
         assertThat(testDividend.getFranking()).isEqualTo(UPDATED_FRANKING);
-
-        // Validate the Dividend in ElasticSearch
-        Dividend dividendEs = dividendSearchRepository.findOne(testDividend.getId());
-        assertThat(dividendEs).isEqualToComparingFieldByField(testDividend);
     }
 
     @Test
@@ -258,8 +248,8 @@ public class DividendResourceIntTest {
     @Transactional
     public void deleteDividend() throws Exception {
         // Initialize the database
-        dividendRepository.saveAndFlush(dividend);
-        dividendSearchRepository.save(dividend);
+        dividendService.save(dividend);
+
         int databaseSizeBeforeDelete = dividendRepository.findAll().size();
 
         // Get the dividend
@@ -267,31 +257,8 @@ public class DividendResourceIntTest {
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
-        // Validate ElasticSearch is empty
-        boolean dividendExistsInEs = dividendSearchRepository.exists(dividend.getId());
-        assertThat(dividendExistsInEs).isFalse();
-
         // Validate the database is empty
         List<Dividend> dividendList = dividendRepository.findAll();
         assertThat(dividendList).hasSize(databaseSizeBeforeDelete - 1);
-    }
-
-    @Test
-    @Transactional
-    public void searchDividend() throws Exception {
-        // Initialize the database
-        dividendRepository.saveAndFlush(dividend);
-        dividendSearchRepository.save(dividend);
-
-        // Search the dividend
-        restDividendMockMvc.perform(get("/api/_search/dividends?query=id:" + dividend.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(dividend.getId().intValue())))
-            .andExpect(jsonPath("$.[*].recordLocalDate").value(hasItem(DEFAULT_RECORD_LOCAL_DATE.toString())))
-            .andExpect(jsonPath("$.[*].exLocalDate").value(hasItem(DEFAULT_EX_LOCAL_DATE.toString())))
-            .andExpect(jsonPath("$.[*].paymentLocalDate").value(hasItem(DEFAULT_PAYMENT_LOCAL_DATE.toString())))
-            .andExpect(jsonPath("$.[*].dps").value(hasItem(DEFAULT_DPS.intValue())))
-            .andExpect(jsonPath("$.[*].franking").value(hasItem(DEFAULT_FRANKING.intValue())));
     }
 }
