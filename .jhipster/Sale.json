@@ -1,0 +1,26 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "owns",
+            "otherEntityName": "security",
+            "otherEntityField": "id"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "units",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "localDate",
+            "fieldType": "LocalDate"
+        }
+    ],
+    "changelogDate": "20161225223305",
+    "entityTableName": "sale",
+    "dto": "no",
+    "pagination": "no",
+    "service": "serviceClass"
+}

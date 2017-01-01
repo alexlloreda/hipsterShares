@@ -1,0 +1,61 @@
+entity Security {
+	ticker String required,
+	issuedUnits Long,
+	spotPrice BigDecimal,
+	currency Currency
+}
+
+enum Currency {
+ 	AUD, USD, EUR, JPY, GBP	
+}
+
+entity SecurityLot {
+	purchasePrice BigDecimal,
+	purchaseLocalDate LocalDate,
+	sellLocalDate LocalDate,
+	sellPrice BigDecimal,
+	units Integer	
+} 
+
+entity Company {
+	name String required
+}
+
+entity Portfolio {
+    name String
+}
+
+entity Purchase {
+	units Integer,
+	LocalDate LocalDate
+}
+
+entity Sale {
+	units Integer,
+	LocalDate LocalDate
+}
+
+entity Dividend {
+	recordLocalDate LocalDate,
+	exLocalDate LocalDate,
+	paymentLocalDate LocalDate,
+	dps BigDecimal,
+	franking BigDecimal
+}
+
+relationship OneToMany {
+	Company{owns} to Security,
+	Portfolio{owns} to SecurityLot
+}
+
+relationship ManyToOne {
+	SecurityLot{owns} to Security,
+	Purchase{owns} to Security,
+	Sale{owns} to Security,
+	Dividend{owns} to Security	
+}
+
+
+//dto * with mapstruct except User
+service * with serviceClass except User
+
