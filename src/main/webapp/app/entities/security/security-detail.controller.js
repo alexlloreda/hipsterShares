@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .controller('SecurityDetailController', SecurityDetailController);
 
     SecurityDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'Security', 'Company'];
@@ -13,7 +13,7 @@
         vm.security = entity;
         vm.previousState = previousState.name;
 
-        var unsubscribe = $rootScope.$on('hipsterSharesApp:securityUpdate', function(event, result) {
+        var unsubscribe = $rootScope.$on('simpleApp:securityUpdate', function(event, result) {
             vm.security = result;
         });
         $scope.$on('$destroy', unsubscribe);

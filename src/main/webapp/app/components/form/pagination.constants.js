@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .constant('paginationConstants', {
             'itemsPerPage': 20
         });

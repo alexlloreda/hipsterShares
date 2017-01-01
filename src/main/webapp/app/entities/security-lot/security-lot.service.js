@@ -1,7 +1,7 @@
 (function() {
     'use strict';
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .factory('SecurityLot', SecurityLot);
 
     SecurityLot.$inject = ['$resource', 'DateUtils'];

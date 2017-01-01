@@ -2,10 +2,8 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp', [
+        .module('simpleApp', [
             'ngStorage',
-            'tmh.dynamicLocale',
-            'pascalprecht.translate',
             'ngResource',
             'ngCookies',
             'ngAria',
@@ -20,10 +18,9 @@
         ])
         .run(run);
 
-    run.$inject = ['stateHandler', 'translationHandler'];
+    run.$inject = ['stateHandler'];
 
-    function run(stateHandler, translationHandler) {
+    function run(stateHandler) {
         stateHandler.initialize();
-        translationHandler.initialize();
     }
 })();

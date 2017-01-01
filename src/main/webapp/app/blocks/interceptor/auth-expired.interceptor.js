@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .factory('authExpiredInterceptor', authExpiredInterceptor);
 
     authExpiredInterceptor.$inject = ['$rootScope', '$q', '$injector'];

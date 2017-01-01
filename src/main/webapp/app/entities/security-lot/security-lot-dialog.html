@@ -4,23 +4,23 @@
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
                 ng-click="vm.clear()">&times;</button>
-        <h4 class="modal-title" id="mySecurityLotLabel" data-translate="hipsterSharesApp.securityLot.home.createOrEditLabel">Create or edit a Security Lot</h4>
+        <h4 class="modal-title" id="mySecurityLotLabel">Create or edit a Security Lot</h4>
     </div>
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
         <div class="form-group" ng-show="vm.securityLot.id">
-            <label for="id" data-translate="global.field.id">ID</label>
+            <label for="id">ID</label>
             <input type="text" class="form-control" id="id" name="id"
                     ng-model="vm.securityLot.id" readonly />
         </div>
         <div class="form-group">
-            <label class="control-label" data-translate="hipsterSharesApp.securityLot.purchasePrice" for="field_purchasePrice">Purchase Price</label>
+            <label class="control-label" for="field_purchasePrice">Purchase Price</label>
             <input type="number" class="form-control" name="purchasePrice" id="field_purchasePrice"
                     ng-model="vm.securityLot.purchasePrice"
                      />
         </div>
         <div class="form-group">
-            <label class="control-label" data-translate="hipsterSharesApp.securityLot.purchaseLocalDate" for="field_purchaseLocalDate">Purchase Local Date</label>
+            <label class="control-label" for="field_purchaseLocalDate">Purchase Local Date</label>
                 <div class="input-group">
                     <input id="field_purchaseLocalDate" type="text" class="form-control" name="purchaseLocalDate" uib-datepicker-popup="{{dateformat}}" ng-model="vm.securityLot.purchaseLocalDate" is-open="vm.datePickerOpenStatus.purchaseLocalDate"
                     />
@@ -30,7 +30,7 @@
                 </div>
         </div>
         <div class="form-group">
-            <label class="control-label" data-translate="hipsterSharesApp.securityLot.sellLocalDate" for="field_sellLocalDate">Sell Local Date</label>
+            <label class="control-label" for="field_sellLocalDate">Sell Local Date</label>
                 <div class="input-group">
                     <input id="field_sellLocalDate" type="text" class="form-control" name="sellLocalDate" uib-datepicker-popup="{{dateformat}}" ng-model="vm.securityLot.sellLocalDate" is-open="vm.datePickerOpenStatus.sellLocalDate"
                     />
@@ -40,26 +40,26 @@
                 </div>
         </div>
         <div class="form-group">
-            <label class="control-label" data-translate="hipsterSharesApp.securityLot.sellPrice" for="field_sellPrice">Sell Price</label>
+            <label class="control-label" for="field_sellPrice">Sell Price</label>
             <input type="number" class="form-control" name="sellPrice" id="field_sellPrice"
                     ng-model="vm.securityLot.sellPrice"
                      />
         </div>
         <div class="form-group">
-            <label class="control-label" data-translate="hipsterSharesApp.securityLot.units" for="field_units">Units</label>
+            <label class="control-label" for="field_units">Units</label>
             <input type="number" class="form-control" name="units" id="field_units"
                     ng-model="vm.securityLot.units"
                      />
         </div>
 
         <div class="form-group">
-            <label data-translate="hipsterSharesApp.securityLot.owns" for="field_owns">Owns</label>
+            <label for="field_owns">Owns</label>
             <select class="form-control" id="field_owns" name="owns" ng-model="vm.securityLot.owns" ng-options="security as security.id for security in vm.securities track by security.id">
                 <option value=""></option>
             </select>
         </div>
         <div class="form-group">
-            <label data-translate="hipsterSharesApp.securityLot.portfolio" for="field_portfolio">Portfolio</label>
+            <label for="field_portfolio">Portfolio</label>
             <select class="form-control" id="field_portfolio" name="portfolio" ng-model="vm.securityLot.portfolio" ng-options="portfolio as portfolio.id for portfolio in vm.portfolios track by portfolio.id">
                 <option value=""></option>
             </select>
@@ -67,10 +67,10 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
-            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span data-translate="entity.action.cancel">Cancel</span>
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span>Cancel</span>
         </button>
         <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
-            <span class="glyphicon glyphicon-save"></span>&nbsp;<span data-translate="entity.action.save">Save</span>
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span>Save</span>
         </button>
     </div>
 </form>

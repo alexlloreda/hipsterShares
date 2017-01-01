@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .config(stateConfig);
 
     stateConfig.$inject = ['$stateProvider'];
@@ -14,7 +14,7 @@
             url: '/dividend',
             data: {
                 authorities: ['ROLE_USER'],
-                pageTitle: 'hipsterSharesApp.dividend.home.title'
+                pageTitle: 'Dividends'
             },
             views: {
                 'content@': {
@@ -24,11 +24,6 @@
                 }
             },
             resolve: {
-                translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
-                    $translatePartialLoader.addPart('dividend');
-                    $translatePartialLoader.addPart('global');
-                    return $translate.refresh();
-                }]
             }
         })
         .state('dividend-detail', {
@@ -36,7 +31,7 @@
             url: '/dividend/{id}',
             data: {
                 authorities: ['ROLE_USER'],
-                pageTitle: 'hipsterSharesApp.dividend.detail.title'
+                pageTitle: 'Dividend'
             },
             views: {
                 'content@': {
@@ -46,10 +41,6 @@
                 }
             },
             resolve: {
-                translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
-                    $translatePartialLoader.addPart('dividend');
-                    return $translate.refresh();
-                }],
                 entity: ['$stateParams', 'Dividend', function($stateParams, Dividend) {
                     return Dividend.get({id : $stateParams.id}).$promise;
                 }],

@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .controller('CompanyDeleteController',CompanyDeleteController);
 
     CompanyDeleteController.$inject = ['$uibModalInstance', 'entity', 'Company'];

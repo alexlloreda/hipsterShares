@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .config(stateConfig);
 
     stateConfig.$inject = ['$stateProvider'];

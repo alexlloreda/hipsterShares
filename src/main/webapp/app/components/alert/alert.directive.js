@@ -11,7 +11,7 @@
     };
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .component('jhiAlert', jhiAlert);
 
     jhiAlertController.$inject = ['$scope', 'AlertService'];

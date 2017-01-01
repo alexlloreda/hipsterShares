@@ -15,6 +15,6 @@
     };
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .component('jhiItemCount', jhiItemCount);
 })();

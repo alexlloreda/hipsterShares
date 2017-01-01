@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .config(stateConfig);
 
     stateConfig.$inject = ['$stateProvider'];
@@ -20,12 +20,6 @@
                     controller: 'HomeController',
                     controllerAs: 'vm'
                 }
-            },
-            resolve: {
-                mainTranslatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate,$translatePartialLoader) {
-                    $translatePartialLoader.addPart('home');
-                    return $translate.refresh();
-                }]
             }
         });
     }

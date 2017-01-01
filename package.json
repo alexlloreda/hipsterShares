@@ -1,7 +1,7 @@
 {
-  "name": "hipster-shares",
+  "name": "simple",
   "version": "0.0.0",
-  "description": "Description for hipsterShares",
+  "description": "Description for simple",
   "private": true,
   "cacheDirectories": [
     "node_modules",

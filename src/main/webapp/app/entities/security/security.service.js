@@ -1,7 +1,7 @@
 (function() {
     'use strict';
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .factory('Security', Security);
 
     Security.$inject = ['$resource'];

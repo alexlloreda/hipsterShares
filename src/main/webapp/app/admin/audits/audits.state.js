@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .config(stateConfig);
 
     stateConfig.$inject = ['$stateProvider'];
@@ -13,7 +13,7 @@
             url: '/audits',
             data: {
                 authorities: ['ROLE_ADMIN'],
-                pageTitle: 'audits.title'
+                pageTitle: 'Audits'
             },
             views: {
                 'content@': {
@@ -21,12 +21,6 @@
                     controller: 'AuditsController',
                     controllerAs: 'vm'
                 }
-            },
-            resolve: {
-                translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
-                    $translatePartialLoader.addPart('audits');
-                    return $translate.refresh();
-                }]
             }
         });
     }

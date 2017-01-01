@@ -1,12 +1,12 @@
 <div>
-    <h2 data-translate="hipsterSharesApp.dividend.home.title">Dividends</h2>
+    <h2>Dividends</h2>
     <jhi-alert></jhi-alert>
     <div class="container-fluid">
         <div class="row">
             <div class="col-xs-4 no-padding-left">
                 <button class="btn btn-primary" ui-sref="dividend.new" >
                     <span class="glyphicon glyphicon-plus"></span>
-                    <span  data-translate="hipsterSharesApp.dividend.home.createLabel">
+                    <span >
                         Create new Dividend
                     </span>
                 </button>
@@ -18,13 +18,13 @@
         <table class="jh-table table table-striped">
             <thead>
                 <tr>
-                    <th><span data-translate="global.field.id">ID</span></th>
-                    <th><span data-translate="hipsterSharesApp.dividend.recordLocalDate">Record Local Date</span></th>
-                    <th><span data-translate="hipsterSharesApp.dividend.exLocalDate">Ex Local Date</span></th>
-                    <th><span data-translate="hipsterSharesApp.dividend.paymentLocalDate">Payment Local Date</span></th>
-                    <th><span data-translate="hipsterSharesApp.dividend.dps">Dps</span></th>
-                    <th><span data-translate="hipsterSharesApp.dividend.franking">Franking</span></th>
-                    <th><span data-translate="hipsterSharesApp.dividend.owns">Owns</span></th>
+                    <th><span>ID</span></th>
+                    <th><span>Record Local Date</span></th>
+                    <th><span>Ex Local Date</span></th>
+                    <th><span>Payment Local Date</span></th>
+                    <th><span>Dps</span></th>
+                    <th><span>Franking</span></th>
+                    <th><span>Owns</span></th>
                     <th></th>
                 </tr>
             </thead>
@@ -45,19 +45,19 @@
                                     ui-sref="dividend-detail({id:dividend.id})"
                                     class="btn btn-info btn-sm">
                                 <span class="glyphicon glyphicon-eye-open"></span>
-                                <span class="hidden-xs hidden-sm" data-translate="entity.action.view"></span>
+                                <span class="hidden-xs hidden-sm"></span>
                             </button>
                             <button type="submit"
                                     ui-sref="dividend.edit({id:dividend.id})"
                                     class="btn btn-primary btn-sm">
                                 <span class="glyphicon glyphicon-pencil"></span>
-                                <span class="hidden-xs hidden-sm" data-translate="entity.action.edit"></span>
+                                <span class="hidden-xs hidden-sm"></span>
                             </button>
                             <button type="submit"
                                     ui-sref="dividend.delete({id:dividend.id})"
                                     class="btn btn-danger btn-sm">
                                 <span class="glyphicon glyphicon-remove-circle"></span>
-                                <span class="hidden-xs hidden-sm" data-translate="entity.action.delete"></span>
+                                <span class="hidden-xs hidden-sm"></span>
                             </button>
                         </div>
                     </td>

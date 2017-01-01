@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .controller('PortfolioDialogController', PortfolioDialogController);
 
     PortfolioDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Portfolio', 'SecurityLot'];
@@ -33,7 +33,7 @@
         }
 
         function onSaveSuccess (result) {
-            $scope.$emit('hipsterSharesApp:portfolioUpdate', result);
+            $scope.$emit('simpleApp:portfolioUpdate', result);
             $uibModalInstance.close(result);
             vm.isSaving = false;
         }

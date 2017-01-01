@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .controller('PurchaseController', PurchaseController);
 
     PurchaseController.$inject = ['$scope', '$state', 'Purchase'];

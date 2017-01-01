@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .controller('CompanyController', CompanyController);
 
     CompanyController.$inject = ['$scope', '$state', 'Company'];

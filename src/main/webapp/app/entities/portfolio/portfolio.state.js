@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .config(stateConfig);
 
     stateConfig.$inject = ['$stateProvider'];
@@ -14,7 +14,7 @@
             url: '/portfolio',
             data: {
                 authorities: ['ROLE_USER'],
-                pageTitle: 'hipsterSharesApp.portfolio.home.title'
+                pageTitle: 'Portfolios'
             },
             views: {
                 'content@': {
@@ -24,11 +24,6 @@
                 }
             },
             resolve: {
-                translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
-                    $translatePartialLoader.addPart('portfolio');
-                    $translatePartialLoader.addPart('global');
-                    return $translate.refresh();
-                }]
             }
         })
         .state('portfolio-detail', {
@@ -36,7 +31,7 @@
             url: '/portfolio/{id}',
             data: {
                 authorities: ['ROLE_USER'],
-                pageTitle: 'hipsterSharesApp.portfolio.detail.title'
+                pageTitle: 'Portfolio'
             },
             views: {
                 'content@': {
@@ -46,10 +41,6 @@
                 }
             },
             resolve: {
-                translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
-                    $translatePartialLoader.addPart('portfolio');
-                    return $translate.refresh();
-                }],
                 entity: ['$stateParams', 'Portfolio', function($stateParams, Portfolio) {
                     return Portfolio.get({id : $stateParams.id}).$promise;
                 }],

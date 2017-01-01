@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .controller('PurchaseDetailController', PurchaseDetailController);
 
     PurchaseDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'Purchase', 'Security'];
@@ -13,7 +13,7 @@
         vm.purchase = entity;
         vm.previousState = previousState.name;
 
-        var unsubscribe = $rootScope.$on('hipsterSharesApp:purchaseUpdate', function(event, result) {
+        var unsubscribe = $rootScope.$on('simpleApp:purchaseUpdate', function(event, result) {
             vm.purchase = result;
         });
         $scope.$on('$destroy', unsubscribe);

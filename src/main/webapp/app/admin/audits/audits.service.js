@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .factory('AuditsService', AuditsService);
 
     AuditsService.$inject = ['$resource'];

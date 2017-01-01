@@ -30,7 +30,7 @@
             "fieldType": "BigDecimal"
         }
     ],
-    "changelogDate": "20161215042336",
+    "changelogDate": "20161225223306",
     "entityTableName": "dividend",
     "dto": "no",
     "pagination": "no",

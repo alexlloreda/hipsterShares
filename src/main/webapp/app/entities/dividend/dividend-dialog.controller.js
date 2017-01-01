@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .controller('DividendDialogController', DividendDialogController);
 
     DividendDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Dividend', 'Security'];
@@ -35,7 +35,7 @@
         }
 
         function onSaveSuccess (result) {
-            $scope.$emit('hipsterSharesApp:dividendUpdate', result);
+            $scope.$emit('simpleApp:dividendUpdate', result);
             $uibModalInstance.close(result);
             vm.isSaving = false;
         }

@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .controller('SecurityLotController', SecurityLotController);
 
     SecurityLotController.$inject = ['$scope', '$state', 'SecurityLot'];

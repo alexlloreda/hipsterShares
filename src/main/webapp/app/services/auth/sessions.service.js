@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .factory('Sessions', Sessions);
 
     Sessions.$inject = ['$resource'];

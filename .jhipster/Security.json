@@ -30,7 +30,7 @@
             "fieldValues": "AUD,USD,EUR,JPY,GBP"
         }
     ],
-    "changelogDate": "20161215042330",
+    "changelogDate": "20161225074217",
     "entityTableName": "security",
     "dto": "no",
     "pagination": "no",

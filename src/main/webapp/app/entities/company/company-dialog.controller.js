@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .controller('CompanyDialogController', CompanyDialogController);
 
     CompanyDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Company', 'Security'];
@@ -33,7 +33,7 @@
         }
 
         function onSaveSuccess (result) {
-            $scope.$emit('hipsterSharesApp:companyUpdate', result);
+            $scope.$emit('simpleApp:companyUpdate', result);
             $uibModalInstance.close(result);
             vm.isSaving = false;
         }

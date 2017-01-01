@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .factory('DataUtils', DataUtils);
 
     DataUtils.$inject = ['$window'];

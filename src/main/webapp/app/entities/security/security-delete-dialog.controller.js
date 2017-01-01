@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .controller('SecurityDeleteController',SecurityDeleteController);
 
     SecurityDeleteController.$inject = ['$uibModalInstance', 'entity', 'Security'];

@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .controller('SecurityLotDetailController', SecurityLotDetailController);
 
     SecurityLotDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'SecurityLot', 'Security', 'Portfolio'];
@@ -13,7 +13,7 @@
         vm.securityLot = entity;
         vm.previousState = previousState.name;
 
-        var unsubscribe = $rootScope.$on('hipsterSharesApp:securityLotUpdate', function(event, result) {
+        var unsubscribe = $rootScope.$on('simpleApp:securityLotUpdate', function(event, result) {
             vm.securityLot = result;
         });
         $scope.$on('$destroy', unsubscribe);

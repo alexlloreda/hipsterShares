@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .config(stateConfig);
 
     stateConfig.$inject = ['$stateProvider'];
@@ -14,7 +14,7 @@
             url: '/security',
             data: {
                 authorities: ['ROLE_USER'],
-                pageTitle: 'hipsterSharesApp.security.home.title'
+                pageTitle: 'Securities'
             },
             views: {
                 'content@': {
@@ -24,12 +24,6 @@
                 }
             },
             resolve: {
-                translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
-                    $translatePartialLoader.addPart('security');
-                    $translatePartialLoader.addPart('currency');
-                    $translatePartialLoader.addPart('global');
-                    return $translate.refresh();
-                }]
             }
         })
         .state('security-detail', {
@@ -37,7 +31,7 @@
             url: '/security/{id}',
             data: {
                 authorities: ['ROLE_USER'],
-                pageTitle: 'hipsterSharesApp.security.detail.title'
+                pageTitle: 'Security'
             },
             views: {
                 'content@': {
@@ -47,11 +41,6 @@
                 }
             },
             resolve: {
-                translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
-                    $translatePartialLoader.addPart('security');
-                    $translatePartialLoader.addPart('currency');
-                    return $translate.refresh();
-                }],
                 entity: ['$stateParams', 'Security', function($stateParams, Security) {
                     return Security.get({id : $stateParams.id}).$promise;
                 }],

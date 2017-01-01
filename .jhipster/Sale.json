@@ -18,7 +18,7 @@
             "fieldType": "LocalDate"
         }
     ],
-    "changelogDate": "20161215042335",
+    "changelogDate": "20161225223305",
     "entityTableName": "sale",
     "dto": "no",
     "pagination": "no",

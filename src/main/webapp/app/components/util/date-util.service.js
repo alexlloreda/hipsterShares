@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .factory('DateUtils', DateUtils);
 
     DateUtils.$inject = ['$filter'];

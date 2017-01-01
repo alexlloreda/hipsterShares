@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('hipsterSharesApp')
+        .module('simpleApp')
         .controller('PortfolioDetailController', PortfolioDetailController);
 
     PortfolioDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'Portfolio', 'SecurityLot'];
@@ -13,7 +13,7 @@
         vm.portfolio = entity;
         vm.previousState = previousState.name;
 
-        var unsubscribe = $rootScope.$on('hipsterSharesApp:portfolioUpdate', function(event, result) {
+        var unsubscribe = $rootScope.$on('simpleApp:portfolioUpdate', function(event, result) {
             vm.portfolio = result;
         });
         $scope.$on('$destroy', unsubscribe);
