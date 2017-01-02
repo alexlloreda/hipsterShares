@@ -1,7 +1,11 @@
 package io.alex.service;
 
 import io.alex.domain.Purchase;
+import io.alex.domain.SecurityLot;
 import io.alex.repository.PurchaseRepository;
+import io.alex.repository.SecurityLotRepository;
+import io.alex.repository.SecurityRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +25,12 @@ public class PurchaseService {
     
     @Inject
     private PurchaseRepository purchaseRepository;
+    
+    @Inject
+    private SecurityRepository securityRepo;
+    
+    @Inject
+    private SecurityLotRepository securityLotRepo;
 
     /**
      * Save a purchase.
@@ -30,6 +40,15 @@ public class PurchaseService {
      */
     public Purchase save(Purchase purchase) {
         log.debug("Request to save Purchase : {}", purchase);
+        // get the security referenced
+        //securityRepo.findByName(purchase.getOwns().getTicker());
+        SecurityLot lot = new SecurityLot();
+        lot.setPurchaseLocalDate(purchase.getLocalDate());
+        //lot.setPurchasePrice(purchase.get);
+        // create a new security block
+        //securityLotRepo.save(buildLot(ticker, amount, purchasePrice))
+        // save the transaction as a purchase
+        
         Purchase result = purchaseRepository.save(purchase);
         return result;
     }

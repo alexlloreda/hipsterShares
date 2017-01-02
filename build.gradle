@@ -82,14 +82,10 @@ test {
     reports.html.enabled = false
 }
 
-
-
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/tests")
     reportOn test
 }
-
-
 
 apply from: 'gradle/yeoman.gradle'
 apply from: 'gradle/sonar.gradle'

@@ -41,13 +41,10 @@ public class PurchaseResource {
     @Timed
     public ResponseEntity<Purchase> createPurchase(@RequestBody Purchase purchase) throws URISyntaxException {
         log.debug("REST request to save Purchase : {}", purchase);
-        if (purchase.getOwns() != null) {
-        	log.debug("REST purchase owns somethings");
-        } else {
-        	log.debug("REST purchase owns nothing: {}", purchase);
-        }
         if (purchase.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("purchase", "idexists", "A new purchase cannot already have an ID")).body(null);
+            return ResponseEntity.badRequest()
+            		.headers(HeaderUtil.createFailureAlert("purchase", "idexists", "A new purchase cannot already have an ID"))
+            		.body(null);
         }
         Purchase result = purchaseService.save(purchase);
         return ResponseEntity.created(new URI("/api/purchases/" + result.getId()))
@@ -101,9 +98,7 @@ public class PurchaseResource {
         log.debug("REST request to get Purchase : {}", id);
         Purchase purchase = purchaseService.findOne(id);
         return Optional.ofNullable(purchase)
-            .map(result -> new ResponseEntity<>(
-                result,
-                HttpStatus.OK))
+            .map(result -> new ResponseEntity<>(result,HttpStatus.OK))
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
