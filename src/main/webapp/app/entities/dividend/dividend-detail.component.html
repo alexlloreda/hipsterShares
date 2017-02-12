@@ -1,0 +1,47 @@
+
+<div *ngIf="dividend">
+    <h2><span>Dividend</span> {{dividend.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row">
+        <dt><span>Record Local Date</span></dt>
+        <dd>
+            <span>{{dividend.recordLocalDate | date:'mediumDate'}}</span>
+        </dd>
+        <dt><span>Ex Local Date</span></dt>
+        <dd>
+            <span>{{dividend.exLocalDate | date:'mediumDate'}}</span>
+        </dd>
+        <dt><span>Payment Local Date</span></dt>
+        <dd>
+            <span>{{dividend.paymentLocalDate | date:'mediumDate'}}</span>
+        </dd>
+        <dt><span>Dps</span></dt>
+        <dd>
+            <span>{{dividend.dps}}</span>
+        </dd>
+        <dt><span>Franking</span></dt>
+        <dd>
+            <span>{{dividend.franking}}</span>
+        </dd>
+        <dt><span>Of Security</span></dt>
+        <dd>
+            <div *ngIf="dividend.ofSecurity">
+                <a [routerLink]="['security', dividend.ofSecurity?.id]">{{dividend.ofSecurity?.id}}</a>
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'dividend/'+ dividend.id + '/edit'} }]"
+            replaceUrl="true"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
+    </button>
+</div>

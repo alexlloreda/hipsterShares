@@ -1,0 +1,39 @@
+
+<div *ngIf="security">
+    <h2><span>Security</span> {{security.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row">
+        <dt><span>Ticker</span></dt>
+        <dd>
+            <span>{{security.ticker}}</span>
+        </dd>
+        <dt><span>Spot Price</span></dt>
+        <dd>
+            <span>{{security.spotPrice}}</span>
+        </dd>
+        <dt><span>Currency</span></dt>
+        <dd>
+            <span>{{security.currency}}</span>
+        </dd>
+        <dt><span>Company</span></dt>
+        <dd>
+            <div *ngIf="security.company">
+                <a [routerLink]="['company', security.company?.id]">{{security.company?.id}}</a>
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'security/'+ security.id + '/edit'} }]"
+            replaceUrl="true"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
+    </button>
+</div>

@@ -1,0 +1,76 @@
+
+
+<form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                (click)="clear()">&times;</button>
+        <h4 class="modal-title" id="myDividendLabel">Create or edit a Dividend</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" [hidden]="!dividend.id">
+            <label for="id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                   [(ngModel)]="dividend.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_recordLocalDate">Record Local Date</label>
+            <div class="input-group">
+                <input id="field_recordLocalDate" type="text" class="form-control" name="recordLocalDate" ngbDatepicker  #recordLocalDateDp="ngbDatepicker" [(ngModel)]="dividend.recordLocalDate"
+                />
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" (click)="recordLocalDateDp.open()"><i class="fa fa-calendar"></i></button>
+                </span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_exLocalDate">Ex Local Date</label>
+            <div class="input-group">
+                <input id="field_exLocalDate" type="text" class="form-control" name="exLocalDate" ngbDatepicker  #exLocalDateDp="ngbDatepicker" [(ngModel)]="dividend.exLocalDate"
+                />
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" (click)="exLocalDateDp.open()"><i class="fa fa-calendar"></i></button>
+                </span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_paymentLocalDate">Payment Local Date</label>
+            <div class="input-group">
+                <input id="field_paymentLocalDate" type="text" class="form-control" name="paymentLocalDate" ngbDatepicker  #paymentLocalDateDp="ngbDatepicker" [(ngModel)]="dividend.paymentLocalDate"
+                />
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" (click)="paymentLocalDateDp.open()"><i class="fa fa-calendar"></i></button>
+                </span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_dps">Dps</label>
+            <input type="number" class="form-control" name="dps" id="field_dps"
+                [(ngModel)]="dividend.dps"
+             />
+        </div>
+        <div class="form-group">
+            <label class="form-control-label" for="field_franking">Franking</label>
+            <input type="number" class="form-control" name="franking" id="field_franking"
+                [(ngModel)]="dividend.franking"
+             />
+        </div>
+
+        <div class="form-group">
+            <label for="field_ofSecurity">Of Security</label>
+            <select class="form-control" id="field_ofSecurity" name="ofSecurity" [(ngModel)]="dividend.ofSecurity" >
+                <option [ngValue]="null"></option>
+                <option [ngValue]="securityOption.id === dividend.ofSecurity?.id ? dividend.ofSecurity : securityOption" *ngFor="let securityOption of securities; trackBy: trackSecurityById">{{securityOption.id}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="clear()">
+            <span class="fa fa-ban"></span>&nbsp;<span>Cancel</span>
+        </button>
+        <button type="submit" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
+            <span class="fa fa-save"></span>&nbsp;<span>Save</span>
+        </button>
+    </div>
+</form>

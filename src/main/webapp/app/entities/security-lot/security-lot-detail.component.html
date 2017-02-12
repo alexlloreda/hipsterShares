@@ -1,0 +1,53 @@
+
+<div *ngIf="securityLot">
+    <h2><span>Security Lot</span> {{securityLot.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row">
+        <dt><span>Purchase Price</span></dt>
+        <dd>
+            <span>{{securityLot.purchasePrice}}</span>
+        </dd>
+        <dt><span>Purchase Local Date</span></dt>
+        <dd>
+            <span>{{securityLot.purchaseLocalDate | date:'mediumDate'}}</span>
+        </dd>
+        <dt><span>Sell Local Date</span></dt>
+        <dd>
+            <span>{{securityLot.sellLocalDate | date:'mediumDate'}}</span>
+        </dd>
+        <dt><span>Sell Price</span></dt>
+        <dd>
+            <span>{{securityLot.sellPrice}}</span>
+        </dd>
+        <dt><span>Units</span></dt>
+        <dd>
+            <span>{{securityLot.units}}</span>
+        </dd>
+        <dt><span>Of Security</span></dt>
+        <dd>
+            <div *ngIf="securityLot.ofSecurity">
+                <a [routerLink]="['security', securityLot.ofSecurity?.id]">{{securityLot.ofSecurity?.id}}</a>
+            </div>
+        </dd>
+        <dt><span>Portfolio</span></dt>
+        <dd>
+            <div *ngIf="securityLot.portfolio">
+                <a [routerLink]="['portfolio', securityLot.portfolio?.id]">{{securityLot.portfolio?.id}}</a>
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'security-lot/'+ securityLot.id + '/edit'} }]"
+            replaceUrl="true"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
+    </button>
+</div>

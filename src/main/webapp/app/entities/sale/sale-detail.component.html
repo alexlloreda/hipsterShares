@@ -1,0 +1,39 @@
+
+<div *ngIf="sale">
+    <h2><span>Sale</span> {{sale.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row">
+        <dt><span>Units</span></dt>
+        <dd>
+            <span>{{sale.units}}</span>
+        </dd>
+        <dt><span>Price</span></dt>
+        <dd>
+            <span>{{sale.price}}</span>
+        </dd>
+        <dt><span>Sale Date</span></dt>
+        <dd>
+            <span>{{sale.saleDate | date:'mediumDate'}}</span>
+        </dd>
+        <dt><span>Of Security</span></dt>
+        <dd>
+            <div *ngIf="sale.ofSecurity">
+                <a [routerLink]="['security', sale.ofSecurity?.id]">{{sale.ofSecurity?.id}}</a>
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'sale/'+ sale.id + '/edit'} }]"
+            replaceUrl="true"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
+    </button>
+</div>

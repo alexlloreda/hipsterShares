@@ -1,0 +1,39 @@
+
+<div *ngIf="purchase">
+    <h2><span>Purchase</span> {{purchase.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row">
+        <dt><span>Units</span></dt>
+        <dd>
+            <span>{{purchase.units}}</span>
+        </dd>
+        <dt><span>Price</span></dt>
+        <dd>
+            <span>{{purchase.price}}</span>
+        </dd>
+        <dt><span>Purchase Date</span></dt>
+        <dd>
+            <span>{{purchase.purchaseDate | date:'mediumDate'}}</span>
+        </dd>
+        <dt><span>Of Security</span></dt>
+        <dd>
+            <div *ngIf="purchase.ofSecurity">
+                <a [routerLink]="['security', purchase.ofSecurity?.id]">{{purchase.ofSecurity?.id}}</a>
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'purchase/'+ purchase.id + '/edit'} }]"
+            replaceUrl="true"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
+    </button>
+</div>
