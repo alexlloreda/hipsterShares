@@ -1,0 +1,38 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "company",
+            "otherEntityName": "company",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "ticker",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "issuedUnits",
+            "fieldType": "Long"
+        },
+        {
+            "fieldName": "spotPrice",
+            "fieldType": "BigDecimal"
+        },
+        {
+            "fieldName": "currency",
+            "fieldType": "Currency",
+            "fieldValues": "AUD,USD,EUR,JPY,GBP"
+        }
+    ],
+    "changelogDate": "20161225074217",
+    "entityTableName": "security",
+    "dto": "no",
+    "pagination": "no",
+    "service": "serviceClass"
+}

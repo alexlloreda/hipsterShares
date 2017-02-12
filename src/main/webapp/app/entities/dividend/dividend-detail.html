@@ -1,0 +1,43 @@
+
+<div>
+    <h2><span>Dividend</span> {{vm.dividend.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span>Record Local Date</span></dt>
+        <dd>
+            <span>{{vm.dividend.recordLocalDate | date:'mediumDate'}}</span>
+        </dd>
+        <dt><span>Ex Local Date</span></dt>
+        <dd>
+            <span>{{vm.dividend.exLocalDate | date:'mediumDate'}}</span>
+        </dd>
+        <dt><span>Payment Local Date</span></dt>
+        <dd>
+            <span>{{vm.dividend.paymentLocalDate | date:'mediumDate'}}</span>
+        </dd>
+        <dt><span>Dps</span></dt>
+        <dd>
+            <span>{{vm.dividend.dps}}</span>
+        </dd>
+        <dt><span>Franking</span></dt>
+        <dd>
+            <span>{{vm.dividend.franking}}</span>
+        </dd>
+        <dt><span>Owns</span></dt>
+        <dd>
+            <a ui-sref="security-detail({id:vm.dividend.owns.id})">{{vm.dividend.owns.id}}</a>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button" ui-sref="dividend-detail.edit({id:vm.dividend.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm"> Edit</span>
+    </button>
+</div>
