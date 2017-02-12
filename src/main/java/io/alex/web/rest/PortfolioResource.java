@@ -2,17 +2,15 @@ package io.alex.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.alex.domain.Portfolio;
-import io.alex.service.PortfolioService;
-import io.alex.web.rest.util.HeaderUtil;
 
+import io.alex.repository.PortfolioRepository;
+import io.alex.web.rest.util.HeaderUtil;
+import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -26,9 +24,14 @@ import java.util.Optional;
 public class PortfolioResource {
 
     private final Logger log = LoggerFactory.getLogger(PortfolioResource.class);
+
+    private static final String ENTITY_NAME = "portfolio";
         
-    @Inject
-    private PortfolioService portfolioService;
+    private final PortfolioRepository portfolioRepository;
+
+    public PortfolioResource(PortfolioRepository portfolioRepository) {
+        this.portfolioRepository = portfolioRepository;
+    }
 
     /**
      * POST  /portfolios : Create a new portfolio.
@@ -42,11 +45,11 @@ public class PortfolioResource {
     public ResponseEntity<Portfolio> createPortfolio(@RequestBody Portfolio portfolio) throws URISyntaxException {
         log.debug("REST request to save Portfolio : {}", portfolio);
         if (portfolio.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("portfolio", "idexists", "A new portfolio cannot already have an ID")).body(null);
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new portfolio cannot already have an ID")).body(null);
         }
-        Portfolio result = portfolioService.save(portfolio);
+        Portfolio result = portfolioRepository.save(portfolio);
         return ResponseEntity.created(new URI("/api/portfolios/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert("portfolio", result.getId().toString()))
+            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
@@ -66,9 +69,9 @@ public class PortfolioResource {
         if (portfolio.getId() == null) {
             return createPortfolio(portfolio);
         }
-        Portfolio result = portfolioService.save(portfolio);
+        Portfolio result = portfolioRepository.save(portfolio);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert("portfolio", portfolio.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, portfolio.getId().toString()))
             .body(result);
     }
 
@@ -81,7 +84,8 @@ public class PortfolioResource {
     @Timed
     public List<Portfolio> getAllPortfolios() {
         log.debug("REST request to get all Portfolios");
-        return portfolioService.findAll();
+        List<Portfolio> portfolios = portfolioRepository.findAll();
+        return portfolios;
     }
 
     /**
@@ -94,12 +98,8 @@ public class PortfolioResource {
     @Timed
     public ResponseEntity<Portfolio> getPortfolio(@PathVariable Long id) {
         log.debug("REST request to get Portfolio : {}", id);
-        Portfolio portfolio = portfolioService.findOne(id);
-        return Optional.ofNullable(portfolio)
-            .map(result -> new ResponseEntity<>(
-                result,
-                HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        Portfolio portfolio = portfolioRepository.findOne(id);
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(portfolio));
     }
 
     /**
@@ -112,8 +112,8 @@ public class PortfolioResource {
     @Timed
     public ResponseEntity<Void> deletePortfolio(@PathVariable Long id) {
         log.debug("REST request to delete Portfolio : {}", id);
-        portfolioService.delete(id);
-        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("portfolio", id.toString())).build();
+        portfolioRepository.delete(id);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
 }

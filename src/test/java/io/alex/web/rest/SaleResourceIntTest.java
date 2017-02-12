@@ -1,6 +1,6 @@
 package io.alex.web.rest;
 
-import io.alex.SimpleApp;
+import io.alex.HipsterSharesApp;
 
 import io.alex.domain.Sale;
 import io.alex.repository.SaleRepository;
@@ -10,20 +10,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,28 +37,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see SaleResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SimpleApp.class)
+@SpringBootTest(classes = HipsterSharesApp.class)
 public class SaleResourceIntTest {
 
     private static final Integer DEFAULT_UNITS = 1;
     private static final Integer UPDATED_UNITS = 2;
 
-    private static final LocalDate DEFAULT_LOCAL_DATE = LocalDate.ofEpochDay(0L);
-    private static final LocalDate UPDATED_LOCAL_DATE = LocalDate.now(ZoneId.systemDefault());
+    private static final BigDecimal DEFAULT_PRICE = new BigDecimal(1);
+    private static final BigDecimal UPDATED_PRICE = new BigDecimal(2);
 
-    @Inject
+    private static final LocalDate DEFAULT_SALE_DATE = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_SALE_DATE = LocalDate.now(ZoneId.systemDefault());
+
+    @Autowired
     private SaleRepository saleRepository;
 
-    @Inject
+    @Autowired
     private SaleService saleService;
 
-    @Inject
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
-    @Inject
+    @Autowired
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
-    @Inject
+    @Autowired
     private EntityManager em;
 
     private MockMvc restSaleMockMvc;
@@ -68,8 +71,7 @@ public class SaleResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        SaleResource saleResource = new SaleResource();
-        ReflectionTestUtils.setField(saleResource, "saleService", saleService);
+        SaleResource saleResource = new SaleResource(saleService);
         this.restSaleMockMvc = MockMvcBuilders.standaloneSetup(saleResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -84,7 +86,8 @@ public class SaleResourceIntTest {
     public static Sale createEntity(EntityManager em) {
         Sale sale = new Sale()
                 .units(DEFAULT_UNITS)
-                .localDate(DEFAULT_LOCAL_DATE);
+                .price(DEFAULT_PRICE)
+                .saleDate(DEFAULT_SALE_DATE);
         return sale;
     }
 
@@ -110,7 +113,8 @@ public class SaleResourceIntTest {
         assertThat(saleList).hasSize(databaseSizeBeforeCreate + 1);
         Sale testSale = saleList.get(saleList.size() - 1);
         assertThat(testSale.getUnits()).isEqualTo(DEFAULT_UNITS);
-        assertThat(testSale.getLocalDate()).isEqualTo(DEFAULT_LOCAL_DATE);
+        assertThat(testSale.getPrice()).isEqualTo(DEFAULT_PRICE);
+        assertThat(testSale.getSaleDate()).isEqualTo(DEFAULT_SALE_DATE);
     }
 
     @Test
@@ -145,7 +149,8 @@ public class SaleResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(sale.getId().intValue())))
             .andExpect(jsonPath("$.[*].units").value(hasItem(DEFAULT_UNITS)))
-            .andExpect(jsonPath("$.[*].localDate").value(hasItem(DEFAULT_LOCAL_DATE.toString())));
+            .andExpect(jsonPath("$.[*].price").value(hasItem(DEFAULT_PRICE.intValue())))
+            .andExpect(jsonPath("$.[*].saleDate").value(hasItem(DEFAULT_SALE_DATE.toString())));
     }
 
     @Test
@@ -160,7 +165,8 @@ public class SaleResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(sale.getId().intValue()))
             .andExpect(jsonPath("$.units").value(DEFAULT_UNITS))
-            .andExpect(jsonPath("$.localDate").value(DEFAULT_LOCAL_DATE.toString()));
+            .andExpect(jsonPath("$.price").value(DEFAULT_PRICE.intValue()))
+            .andExpect(jsonPath("$.saleDate").value(DEFAULT_SALE_DATE.toString()));
     }
 
     @Test
@@ -183,7 +189,8 @@ public class SaleResourceIntTest {
         Sale updatedSale = saleRepository.findOne(sale.getId());
         updatedSale
                 .units(UPDATED_UNITS)
-                .localDate(UPDATED_LOCAL_DATE);
+                .price(UPDATED_PRICE)
+                .saleDate(UPDATED_SALE_DATE);
 
         restSaleMockMvc.perform(put("/api/sales")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -195,7 +202,8 @@ public class SaleResourceIntTest {
         assertThat(saleList).hasSize(databaseSizeBeforeUpdate);
         Sale testSale = saleList.get(saleList.size() - 1);
         assertThat(testSale.getUnits()).isEqualTo(UPDATED_UNITS);
-        assertThat(testSale.getLocalDate()).isEqualTo(UPDATED_LOCAL_DATE);
+        assertThat(testSale.getPrice()).isEqualTo(UPDATED_PRICE);
+        assertThat(testSale.getSaleDate()).isEqualTo(UPDATED_SALE_DATE);
     }
 
     @Test
@@ -232,5 +240,10 @@ public class SaleResourceIntTest {
         // Validate the database is empty
         List<Sale> saleList = saleRepository.findAll();
         assertThat(saleList).hasSize(databaseSizeBeforeDelete - 1);
+    }
+
+    @Test
+    public void equalsVerifier() throws Exception {
+        TestUtil.equalsVerifier(Sale.class);
     }
 }

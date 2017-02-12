@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import java.util.List;
 
 /**
@@ -19,8 +18,11 @@ public class SaleService {
 
     private final Logger log = LoggerFactory.getLogger(SaleService.class);
     
-    @Inject
-    private SaleRepository saleRepository;
+    private final SaleRepository saleRepository;
+
+    public SaleService(SaleRepository saleRepository) {
+        this.saleRepository = saleRepository;
+    }
 
     /**
      * Save a sale.
@@ -39,7 +41,7 @@ public class SaleService {
      *  
      *  @return the list of entities
      */
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public List<Sale> findAll() {
         log.debug("Request to get all Sales");
         List<Sale> result = saleRepository.findAll();
@@ -53,7 +55,7 @@ public class SaleService {
      *  @param id the id of the entity
      *  @return the entity
      */
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public Sale findOne(Long id) {
         log.debug("Request to get Sale : {}", id);
         Sale sale = saleRepository.findOne(id);

@@ -4,15 +4,12 @@ import com.codahale.metrics.annotation.Timed;
 import io.alex.domain.Sale;
 import io.alex.service.SaleService;
 import io.alex.web.rest.util.HeaderUtil;
-
+import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -26,9 +23,14 @@ import java.util.Optional;
 public class SaleResource {
 
     private final Logger log = LoggerFactory.getLogger(SaleResource.class);
+
+    private static final String ENTITY_NAME = "sale";
         
-    @Inject
-    private SaleService saleService;
+    private final SaleService saleService;
+
+    public SaleResource(SaleService saleService) {
+        this.saleService = saleService;
+    }
 
     /**
      * POST  /sales : Create a new sale.
@@ -42,11 +44,11 @@ public class SaleResource {
     public ResponseEntity<Sale> createSale(@RequestBody Sale sale) throws URISyntaxException {
         log.debug("REST request to save Sale : {}", sale);
         if (sale.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("sale", "idexists", "A new sale cannot already have an ID")).body(null);
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new sale cannot already have an ID")).body(null);
         }
         Sale result = saleService.save(sale);
         return ResponseEntity.created(new URI("/api/sales/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert("sale", result.getId().toString()))
+            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
@@ -68,7 +70,7 @@ public class SaleResource {
         }
         Sale result = saleService.save(sale);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert("sale", sale.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, sale.getId().toString()))
             .body(result);
     }
 
@@ -95,11 +97,7 @@ public class SaleResource {
     public ResponseEntity<Sale> getSale(@PathVariable Long id) {
         log.debug("REST request to get Sale : {}", id);
         Sale sale = saleService.findOne(id);
-        return Optional.ofNullable(sale)
-            .map(result -> new ResponseEntity<>(
-                result,
-                HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(sale));
     }
 
     /**
@@ -113,7 +111,7 @@ public class SaleResource {
     public ResponseEntity<Void> deleteSale(@PathVariable Long id) {
         log.debug("REST request to delete Sale : {}", id);
         saleService.delete(id);
-        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("sale", id.toString())).build();
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
 }

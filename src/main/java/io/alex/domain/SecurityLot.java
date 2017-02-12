@@ -17,7 +17,8 @@ public class SecurityLot implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
 
     @Column(name = "purchase_price", precision=10, scale=2)
@@ -36,7 +37,7 @@ public class SecurityLot implements Serializable {
     private Integer units;
 
     @ManyToOne
-    private Security owns;
+    private Security ofSecurity;
 
     @ManyToOne
     private Portfolio portfolio;
@@ -114,17 +115,17 @@ public class SecurityLot implements Serializable {
         this.units = units;
     }
 
-    public Security getOwns() {
-        return owns;
+    public Security getOfSecurity() {
+        return ofSecurity;
     }
 
-    public SecurityLot owns(Security security) {
-        this.owns = security;
+    public SecurityLot ofSecurity(Security security) {
+        this.ofSecurity = security;
         return this;
     }
 
-    public void setOwns(Security security) {
-        this.owns = security;
+    public void setOfSecurity(Security security) {
+        this.ofSecurity = security;
     }
 
     public Portfolio getPortfolio() {

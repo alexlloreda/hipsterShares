@@ -19,7 +19,8 @@ public class Company implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
 
     @NotNull
@@ -28,7 +29,7 @@ public class Company implements Serializable {
 
     @OneToMany(mappedBy = "company")
     @JsonIgnore
-    private Set<Security> owns = new HashSet<>();
+    private Set<Security> issues = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -51,29 +52,29 @@ public class Company implements Serializable {
         this.name = name;
     }
 
-    public Set<Security> getOwns() {
-        return owns;
+    public Set<Security> getIssues() {
+        return issues;
     }
 
-    public Company owns(Set<Security> securities) {
-        this.owns = securities;
+    public Company issues(Set<Security> securities) {
+        this.issues = securities;
         return this;
     }
 
-    public Company addOwns(Security security) {
-        owns.add(security);
+    public Company addIssues(Security security) {
+        this.issues.add(security);
         security.setCompany(this);
         return this;
     }
 
-    public Company removeOwns(Security security) {
-        owns.remove(security);
+    public Company removeIssues(Security security) {
+        this.issues.remove(security);
         security.setCompany(null);
         return this;
     }
 
-    public void setOwns(Set<Security> securities) {
-        this.owns = securities;
+    public void setIssues(Set<Security> securities) {
+        this.issues = securities;
     }
 
     @Override

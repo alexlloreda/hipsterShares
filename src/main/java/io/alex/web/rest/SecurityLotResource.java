@@ -2,17 +2,15 @@ package io.alex.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.alex.domain.SecurityLot;
-import io.alex.service.SecurityLotService;
-import io.alex.web.rest.util.HeaderUtil;
 
+import io.alex.repository.SecurityLotRepository;
+import io.alex.web.rest.util.HeaderUtil;
+import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -26,9 +24,14 @@ import java.util.Optional;
 public class SecurityLotResource {
 
     private final Logger log = LoggerFactory.getLogger(SecurityLotResource.class);
+
+    private static final String ENTITY_NAME = "securityLot";
         
-    @Inject
-    private SecurityLotService securityLotService;
+    private final SecurityLotRepository securityLotRepository;
+
+    public SecurityLotResource(SecurityLotRepository securityLotRepository) {
+        this.securityLotRepository = securityLotRepository;
+    }
 
     /**
      * POST  /security-lots : Create a new securityLot.
@@ -42,11 +45,11 @@ public class SecurityLotResource {
     public ResponseEntity<SecurityLot> createSecurityLot(@RequestBody SecurityLot securityLot) throws URISyntaxException {
         log.debug("REST request to save SecurityLot : {}", securityLot);
         if (securityLot.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("securityLot", "idexists", "A new securityLot cannot already have an ID")).body(null);
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new securityLot cannot already have an ID")).body(null);
         }
-        SecurityLot result = securityLotService.save(securityLot);
+        SecurityLot result = securityLotRepository.save(securityLot);
         return ResponseEntity.created(new URI("/api/security-lots/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert("securityLot", result.getId().toString()))
+            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
@@ -66,9 +69,9 @@ public class SecurityLotResource {
         if (securityLot.getId() == null) {
             return createSecurityLot(securityLot);
         }
-        SecurityLot result = securityLotService.save(securityLot);
+        SecurityLot result = securityLotRepository.save(securityLot);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert("securityLot", securityLot.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, securityLot.getId().toString()))
             .body(result);
     }
 
@@ -81,7 +84,8 @@ public class SecurityLotResource {
     @Timed
     public List<SecurityLot> getAllSecurityLots() {
         log.debug("REST request to get all SecurityLots");
-        return securityLotService.findAll();
+        List<SecurityLot> securityLots = securityLotRepository.findAll();
+        return securityLots;
     }
 
     /**
@@ -94,12 +98,8 @@ public class SecurityLotResource {
     @Timed
     public ResponseEntity<SecurityLot> getSecurityLot(@PathVariable Long id) {
         log.debug("REST request to get SecurityLot : {}", id);
-        SecurityLot securityLot = securityLotService.findOne(id);
-        return Optional.ofNullable(securityLot)
-            .map(result -> new ResponseEntity<>(
-                result,
-                HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        SecurityLot securityLot = securityLotRepository.findOne(id);
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(securityLot));
     }
 
     /**
@@ -112,8 +112,8 @@ public class SecurityLotResource {
     @Timed
     public ResponseEntity<Void> deleteSecurityLot(@PathVariable Long id) {
         log.debug("REST request to delete SecurityLot : {}", id);
-        securityLotService.delete(id);
-        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("securityLot", id.toString())).build();
+        securityLotRepository.delete(id);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
 }

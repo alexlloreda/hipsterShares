@@ -1,6 +1,6 @@
 package io.alex.web.rest;
 
-import io.alex.SimpleApp;
+import io.alex.HipsterSharesApp;
 
 import io.alex.domain.Purchase;
 import io.alex.repository.PurchaseRepository;
@@ -10,20 +10,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,28 +37,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see PurchaseResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SimpleApp.class)
+@SpringBootTest(classes = HipsterSharesApp.class)
 public class PurchaseResourceIntTest {
 
     private static final Integer DEFAULT_UNITS = 1;
     private static final Integer UPDATED_UNITS = 2;
 
-    private static final LocalDate DEFAULT_LOCAL_DATE = LocalDate.ofEpochDay(0L);
-    private static final LocalDate UPDATED_LOCAL_DATE = LocalDate.now(ZoneId.systemDefault());
+    private static final BigDecimal DEFAULT_PRICE = new BigDecimal(1);
+    private static final BigDecimal UPDATED_PRICE = new BigDecimal(2);
 
-    @Inject
+    private static final LocalDate DEFAULT_PURCHASE_DATE = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_PURCHASE_DATE = LocalDate.now(ZoneId.systemDefault());
+
+    @Autowired
     private PurchaseRepository purchaseRepository;
 
-    @Inject
+    @Autowired
     private PurchaseService purchaseService;
 
-    @Inject
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
-    @Inject
+    @Autowired
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
-    @Inject
+    @Autowired
     private EntityManager em;
 
     private MockMvc restPurchaseMockMvc;
@@ -68,8 +71,7 @@ public class PurchaseResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        PurchaseResource purchaseResource = new PurchaseResource();
-        ReflectionTestUtils.setField(purchaseResource, "purchaseService", purchaseService);
+        PurchaseResource purchaseResource = new PurchaseResource(purchaseService);
         this.restPurchaseMockMvc = MockMvcBuilders.standaloneSetup(purchaseResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -84,7 +86,8 @@ public class PurchaseResourceIntTest {
     public static Purchase createEntity(EntityManager em) {
         Purchase purchase = new Purchase()
                 .units(DEFAULT_UNITS)
-                .localDate(DEFAULT_LOCAL_DATE);
+                .price(DEFAULT_PRICE)
+                .purchaseDate(DEFAULT_PURCHASE_DATE);
         return purchase;
     }
 
@@ -110,7 +113,8 @@ public class PurchaseResourceIntTest {
         assertThat(purchaseList).hasSize(databaseSizeBeforeCreate + 1);
         Purchase testPurchase = purchaseList.get(purchaseList.size() - 1);
         assertThat(testPurchase.getUnits()).isEqualTo(DEFAULT_UNITS);
-        assertThat(testPurchase.getLocalDate()).isEqualTo(DEFAULT_LOCAL_DATE);
+        assertThat(testPurchase.getPrice()).isEqualTo(DEFAULT_PRICE);
+        assertThat(testPurchase.getPurchaseDate()).isEqualTo(DEFAULT_PURCHASE_DATE);
     }
 
     @Test
@@ -145,7 +149,8 @@ public class PurchaseResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(purchase.getId().intValue())))
             .andExpect(jsonPath("$.[*].units").value(hasItem(DEFAULT_UNITS)))
-            .andExpect(jsonPath("$.[*].localDate").value(hasItem(DEFAULT_LOCAL_DATE.toString())));
+            .andExpect(jsonPath("$.[*].price").value(hasItem(DEFAULT_PRICE.intValue())))
+            .andExpect(jsonPath("$.[*].purchaseDate").value(hasItem(DEFAULT_PURCHASE_DATE.toString())));
     }
 
     @Test
@@ -160,7 +165,8 @@ public class PurchaseResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(purchase.getId().intValue()))
             .andExpect(jsonPath("$.units").value(DEFAULT_UNITS))
-            .andExpect(jsonPath("$.localDate").value(DEFAULT_LOCAL_DATE.toString()));
+            .andExpect(jsonPath("$.price").value(DEFAULT_PRICE.intValue()))
+            .andExpect(jsonPath("$.purchaseDate").value(DEFAULT_PURCHASE_DATE.toString()));
     }
 
     @Test
@@ -175,7 +181,7 @@ public class PurchaseResourceIntTest {
     @Transactional
     public void updatePurchase() throws Exception {
         // Initialize the database
-        purchaseService.doPurchase(purchase);
+        purchaseService.save(purchase);
 
         int databaseSizeBeforeUpdate = purchaseRepository.findAll().size();
 
@@ -183,7 +189,8 @@ public class PurchaseResourceIntTest {
         Purchase updatedPurchase = purchaseRepository.findOne(purchase.getId());
         updatedPurchase
                 .units(UPDATED_UNITS)
-                .localDate(UPDATED_LOCAL_DATE);
+                .price(UPDATED_PRICE)
+                .purchaseDate(UPDATED_PURCHASE_DATE);
 
         restPurchaseMockMvc.perform(put("/api/purchases")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -195,7 +202,8 @@ public class PurchaseResourceIntTest {
         assertThat(purchaseList).hasSize(databaseSizeBeforeUpdate);
         Purchase testPurchase = purchaseList.get(purchaseList.size() - 1);
         assertThat(testPurchase.getUnits()).isEqualTo(UPDATED_UNITS);
-        assertThat(testPurchase.getLocalDate()).isEqualTo(UPDATED_LOCAL_DATE);
+        assertThat(testPurchase.getPrice()).isEqualTo(UPDATED_PRICE);
+        assertThat(testPurchase.getPurchaseDate()).isEqualTo(UPDATED_PURCHASE_DATE);
     }
 
     @Test
@@ -220,7 +228,7 @@ public class PurchaseResourceIntTest {
     @Transactional
     public void deletePurchase() throws Exception {
         // Initialize the database
-        purchaseService.doPurchase(purchase);
+        purchaseService.save(purchase);
 
         int databaseSizeBeforeDelete = purchaseRepository.findAll().size();
 
@@ -232,5 +240,10 @@ public class PurchaseResourceIntTest {
         // Validate the database is empty
         List<Purchase> purchaseList = purchaseRepository.findAll();
         assertThat(purchaseList).hasSize(databaseSizeBeforeDelete - 1);
+    }
+
+    @Test
+    public void equalsVerifier() throws Exception {
+        TestUtil.equalsVerifier(Purchase.class);
     }
 }

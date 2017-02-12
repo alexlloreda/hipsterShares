@@ -18,7 +18,8 @@ public class Portfolio implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
 
     @Column(name = "name")
@@ -59,13 +60,13 @@ public class Portfolio implements Serializable {
     }
 
     public Portfolio addOwns(SecurityLot securityLot) {
-        owns.add(securityLot);
+        this.owns.add(securityLot);
         securityLot.setPortfolio(this);
         return this;
     }
 
     public Portfolio removeOwns(SecurityLot securityLot) {
-        owns.remove(securityLot);
+        this.owns.remove(securityLot);
         securityLot.setPortfolio(null);
         return this;
     }

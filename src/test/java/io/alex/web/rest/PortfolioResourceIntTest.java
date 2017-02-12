@@ -1,26 +1,24 @@
 package io.alex.web.rest;
 
-import io.alex.SimpleApp;
+import io.alex.HipsterSharesApp;
 
 import io.alex.domain.Portfolio;
 import io.alex.repository.PortfolioRepository;
-import io.alex.service.PortfolioService;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.util.List;
 
@@ -35,25 +33,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see PortfolioResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SimpleApp.class)
+@SpringBootTest(classes = HipsterSharesApp.class)
 public class PortfolioResourceIntTest {
 
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
-    @Inject
+    @Autowired
     private PortfolioRepository portfolioRepository;
 
-    @Inject
-    private PortfolioService portfolioService;
-
-    @Inject
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
-    @Inject
+    @Autowired
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
-    @Inject
+    @Autowired
     private EntityManager em;
 
     private MockMvc restPortfolioMockMvc;
@@ -63,8 +58,7 @@ public class PortfolioResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        PortfolioResource portfolioResource = new PortfolioResource();
-        ReflectionTestUtils.setField(portfolioResource, "portfolioService", portfolioService);
+            PortfolioResource portfolioResource = new PortfolioResource(portfolioRepository);
         this.restPortfolioMockMvc = MockMvcBuilders.standaloneSetup(portfolioResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -166,8 +160,7 @@ public class PortfolioResourceIntTest {
     @Transactional
     public void updatePortfolio() throws Exception {
         // Initialize the database
-        portfolioService.save(portfolio);
-
+        portfolioRepository.saveAndFlush(portfolio);
         int databaseSizeBeforeUpdate = portfolioRepository.findAll().size();
 
         // Update the portfolio
@@ -209,8 +202,7 @@ public class PortfolioResourceIntTest {
     @Transactional
     public void deletePortfolio() throws Exception {
         // Initialize the database
-        portfolioService.save(portfolio);
-
+        portfolioRepository.saveAndFlush(portfolio);
         int databaseSizeBeforeDelete = portfolioRepository.findAll().size();
 
         // Get the portfolio
@@ -221,5 +213,10 @@ public class PortfolioResourceIntTest {
         // Validate the database is empty
         List<Portfolio> portfolioList = portfolioRepository.findAll();
         assertThat(portfolioList).hasSize(databaseSizeBeforeDelete - 1);
+    }
+
+    @Test
+    public void equalsVerifier() throws Exception {
+        TestUtil.equalsVerifier(Portfolio.class);
     }
 }

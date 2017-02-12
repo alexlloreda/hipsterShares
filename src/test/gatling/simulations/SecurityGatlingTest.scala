@@ -67,7 +67,7 @@ class SecurityGatlingTest extends Simulation {
             .exec(http("Create new security")
             .post("/api/securities")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "ticker":"SAMPLE_TEXT", "issuedUnits":null, "spotPrice":null, "currency":null}""")).asJSON
+            .body(StringBody("""{"id":null, "ticker":"SAMPLE_TEXT", "spotPrice":null, "currency":null}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_security_url"))).exitHereIfFailed
             .pause(10)

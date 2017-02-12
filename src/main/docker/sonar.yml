@@ -1,8 +1,8 @@
 version: '2'
 services:
-    simple-sonar:
-        container_name: simple-sonar
-        image: sonarqube:6.1-alpine
+    hipstershares-sonar:
+        container_name: hipstershares-sonar
+        image: sonarqube:6.2-alpine
         ports:
             - 9000:9000
             - 9092:9092

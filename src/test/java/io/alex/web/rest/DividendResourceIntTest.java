@@ -1,26 +1,24 @@
 package io.alex.web.rest;
 
-import io.alex.SimpleApp;
+import io.alex.HipsterSharesApp;
 
 import io.alex.domain.Dividend;
 import io.alex.repository.DividendRepository;
-import io.alex.service.DividendService;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -38,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see DividendResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SimpleApp.class)
+@SpringBootTest(classes = HipsterSharesApp.class)
 public class DividendResourceIntTest {
 
     private static final LocalDate DEFAULT_RECORD_LOCAL_DATE = LocalDate.ofEpochDay(0L);
@@ -56,19 +54,16 @@ public class DividendResourceIntTest {
     private static final BigDecimal DEFAULT_FRANKING = new BigDecimal(1);
     private static final BigDecimal UPDATED_FRANKING = new BigDecimal(2);
 
-    @Inject
+    @Autowired
     private DividendRepository dividendRepository;
 
-    @Inject
-    private DividendService dividendService;
-
-    @Inject
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
-    @Inject
+    @Autowired
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
-    @Inject
+    @Autowired
     private EntityManager em;
 
     private MockMvc restDividendMockMvc;
@@ -78,8 +73,7 @@ public class DividendResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        DividendResource dividendResource = new DividendResource();
-        ReflectionTestUtils.setField(dividendResource, "dividendService", dividendService);
+            DividendResource dividendResource = new DividendResource(dividendRepository);
         this.restDividendMockMvc = MockMvcBuilders.standaloneSetup(dividendResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -197,8 +191,7 @@ public class DividendResourceIntTest {
     @Transactional
     public void updateDividend() throws Exception {
         // Initialize the database
-        dividendService.save(dividend);
-
+        dividendRepository.saveAndFlush(dividend);
         int databaseSizeBeforeUpdate = dividendRepository.findAll().size();
 
         // Update the dividend
@@ -248,8 +241,7 @@ public class DividendResourceIntTest {
     @Transactional
     public void deleteDividend() throws Exception {
         // Initialize the database
-        dividendService.save(dividend);
-
+        dividendRepository.saveAndFlush(dividend);
         int databaseSizeBeforeDelete = dividendRepository.findAll().size();
 
         // Get the dividend
@@ -260,5 +252,10 @@ public class DividendResourceIntTest {
         // Validate the database is empty
         List<Dividend> dividendList = dividendRepository.findAll();
         assertThat(dividendList).hasSize(databaseSizeBeforeDelete - 1);
+    }
+
+    @Test
+    public void equalsVerifier() throws Exception {
+        TestUtil.equalsVerifier(Dividend.class);
     }
 }

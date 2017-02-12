@@ -1,7 +1,7 @@
 {
   "generator-jhipster": {
-    "jhipsterVersion": "3.12.1",
-    "baseName": "simple",
+    "jhipsterVersion": "4.0.2",
+    "baseName": "hipsterShares",
     "packageName": "io.alex",
     "packageFolder": "io/alex",
     "serverPort": "8080",
@@ -10,15 +10,17 @@
     "clusteredHttpSession": false,
     "websocket": false,
     "databaseType": "sql",
-    "devDatabaseType": "h2Memory",
+    "devDatabaseType": "h2Disk",
     "prodDatabaseType": "postgresql",
     "searchEngine": false,
     "messageBroker": false,
     "buildTool": "gradle",
     "enableSocialSignIn": false,
-    "rememberMeKey": "f1f84b1a75aba45336bb66db46cf7158605e6b1b",
+    "rememberMeKey": "45dd78ba80a51659d941bc195e6e5cd5e1d5f5dc",
     "useSass": false,
+    "clientPackageManager": "yarn",
     "applicationType": "monolith",
+    "clientFramework": "angular2",
     "testFrameworks": [
       "gatling"
     ],

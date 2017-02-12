@@ -3,6 +3,7 @@ package io.alex.domain;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -16,17 +17,21 @@ public class Purchase implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
 
     @Column(name = "units")
     private Integer units;
 
-    @Column(name = "local_date")
-    private LocalDate localDate;
+    @Column(name = "price", precision=10, scale=2)
+    private BigDecimal price;
+
+    @Column(name = "purchase_date")
+    private LocalDate purchaseDate;
 
     @ManyToOne
-    private Security owns;
+    private Security ofSecurity;
 
     public Long getId() {
         return id;
@@ -49,30 +54,43 @@ public class Purchase implements Serializable {
         this.units = units;
     }
 
-    public LocalDate getLocalDate() {
-        return localDate;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public Purchase localDate(LocalDate localDate) {
-        this.localDate = localDate;
+    public Purchase price(BigDecimal price) {
+        this.price = price;
         return this;
     }
 
-    public void setLocalDate(LocalDate localDate) {
-        this.localDate = localDate;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
-    public Security getOwns() {
-        return owns;
+    public LocalDate getPurchaseDate() {
+        return purchaseDate;
     }
 
-    public Purchase owns(Security security) {
-        this.owns = security;
+    public Purchase purchaseDate(LocalDate purchaseDate) {
+        this.purchaseDate = purchaseDate;
         return this;
     }
 
-    public void setOwns(Security security) {
-        this.owns = security;
+    public void setPurchaseDate(LocalDate purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
+
+    public Security getOfSecurity() {
+        return ofSecurity;
+    }
+
+    public Purchase ofSecurity(Security security) {
+        this.ofSecurity = security;
+        return this;
+    }
+
+    public void setOfSecurity(Security security) {
+        this.ofSecurity = security;
     }
 
     @Override
@@ -100,8 +118,8 @@ public class Purchase implements Serializable {
         return "Purchase{" +
             "id=" + id +
             ", units='" + units + "'" +
-            ", localDate='" + localDate + "'" +
-            ", owns='" + (owns == null ? "null'" : (owns+"'")) +
+            ", price='" + price + "'" +
+            ", purchaseDate='" + purchaseDate + "'" +
             '}';
     }
 }

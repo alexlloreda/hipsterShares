@@ -2,17 +2,15 @@ package io.alex.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.alex.domain.Company;
-import io.alex.service.CompanyService;
-import io.alex.web.rest.util.HeaderUtil;
 
+import io.alex.repository.CompanyRepository;
+import io.alex.web.rest.util.HeaderUtil;
+import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,9 +25,14 @@ import java.util.Optional;
 public class CompanyResource {
 
     private final Logger log = LoggerFactory.getLogger(CompanyResource.class);
+
+    private static final String ENTITY_NAME = "company";
         
-    @Inject
-    private CompanyService companyService;
+    private final CompanyRepository companyRepository;
+
+    public CompanyResource(CompanyRepository companyRepository) {
+        this.companyRepository = companyRepository;
+    }
 
     /**
      * POST  /companies : Create a new company.
@@ -43,11 +46,11 @@ public class CompanyResource {
     public ResponseEntity<Company> createCompany(@Valid @RequestBody Company company) throws URISyntaxException {
         log.debug("REST request to save Company : {}", company);
         if (company.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("company", "idexists", "A new company cannot already have an ID")).body(null);
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new company cannot already have an ID")).body(null);
         }
-        Company result = companyService.save(company);
+        Company result = companyRepository.save(company);
         return ResponseEntity.created(new URI("/api/companies/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert("company", result.getId().toString()))
+            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
@@ -67,9 +70,9 @@ public class CompanyResource {
         if (company.getId() == null) {
             return createCompany(company);
         }
-        Company result = companyService.save(company);
+        Company result = companyRepository.save(company);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert("company", company.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, company.getId().toString()))
             .body(result);
     }
 
@@ -82,7 +85,8 @@ public class CompanyResource {
     @Timed
     public List<Company> getAllCompanies() {
         log.debug("REST request to get all Companies");
-        return companyService.findAll();
+        List<Company> companies = companyRepository.findAll();
+        return companies;
     }
 
     /**
@@ -95,12 +99,8 @@ public class CompanyResource {
     @Timed
     public ResponseEntity<Company> getCompany(@PathVariable Long id) {
         log.debug("REST request to get Company : {}", id);
-        Company company = companyService.findOne(id);
-        return Optional.ofNullable(company)
-            .map(result -> new ResponseEntity<>(
-                result,
-                HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        Company company = companyRepository.findOne(id);
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(company));
     }
 
     /**
@@ -113,8 +113,8 @@ public class CompanyResource {
     @Timed
     public ResponseEntity<Void> deleteCompany(@PathVariable Long id) {
         log.debug("REST request to delete Company : {}", id);
-        companyService.delete(id);
-        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("company", id.toString())).build();
+        companyRepository.delete(id);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
 }

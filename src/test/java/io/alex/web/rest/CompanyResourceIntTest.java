@@ -1,26 +1,24 @@
 package io.alex.web.rest;
 
-import io.alex.SimpleApp;
+import io.alex.HipsterSharesApp;
 
 import io.alex.domain.Company;
 import io.alex.repository.CompanyRepository;
-import io.alex.service.CompanyService;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.util.List;
 
@@ -35,25 +33,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see CompanyResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SimpleApp.class)
+@SpringBootTest(classes = HipsterSharesApp.class)
 public class CompanyResourceIntTest {
 
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
-    @Inject
+    @Autowired
     private CompanyRepository companyRepository;
 
-    @Inject
-    private CompanyService companyService;
-
-    @Inject
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
-    @Inject
+    @Autowired
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
-    @Inject
+    @Autowired
     private EntityManager em;
 
     private MockMvc restCompanyMockMvc;
@@ -63,8 +58,7 @@ public class CompanyResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        CompanyResource companyResource = new CompanyResource();
-        ReflectionTestUtils.setField(companyResource, "companyService", companyService);
+            CompanyResource companyResource = new CompanyResource(companyRepository);
         this.restCompanyMockMvc = MockMvcBuilders.standaloneSetup(companyResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -184,8 +178,7 @@ public class CompanyResourceIntTest {
     @Transactional
     public void updateCompany() throws Exception {
         // Initialize the database
-        companyService.save(company);
-
+        companyRepository.saveAndFlush(company);
         int databaseSizeBeforeUpdate = companyRepository.findAll().size();
 
         // Update the company
@@ -227,8 +220,7 @@ public class CompanyResourceIntTest {
     @Transactional
     public void deleteCompany() throws Exception {
         // Initialize the database
-        companyService.save(company);
-
+        companyRepository.saveAndFlush(company);
         int databaseSizeBeforeDelete = companyRepository.findAll().size();
 
         // Get the company
@@ -239,5 +231,10 @@ public class CompanyResourceIntTest {
         // Validate the database is empty
         List<Company> companyList = companyRepository.findAll();
         assertThat(companyList).hasSize(databaseSizeBeforeDelete - 1);
+    }
+
+    @Test
+    public void equalsVerifier() throws Exception {
+        TestUtil.equalsVerifier(Company.class);
     }
 }

@@ -16,8 +16,8 @@ public final class HeaderUtil {
 
     public static HttpHeaders createAlert(String message, String param) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-simpleApp-alert", message);
-        headers.add("X-simpleApp-params", param);
+        headers.add("X-hipsterSharesApp-alert", message);
+        headers.add("X-hipsterSharesApp-params", param);
         return headers;
     }
 
@@ -36,8 +36,8 @@ public final class HeaderUtil {
     public static HttpHeaders createFailureAlert(String entityName, String errorKey, String defaultMessage) {
         log.error("Entity creation failed, {}", defaultMessage);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-simpleApp-error", defaultMessage);
-        headers.add("X-simpleApp-params", entityName);
+        headers.add("X-hipsterSharesApp-error", defaultMessage);
+        headers.add("X-hipsterSharesApp-params", entityName);
         return headers;
     }
 }

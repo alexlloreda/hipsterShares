@@ -4,15 +4,12 @@ import com.codahale.metrics.annotation.Timed;
 import io.alex.domain.Purchase;
 import io.alex.service.PurchaseService;
 import io.alex.web.rest.util.HeaderUtil;
-
+import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -26,9 +23,14 @@ import java.util.Optional;
 public class PurchaseResource {
 
     private final Logger log = LoggerFactory.getLogger(PurchaseResource.class);
+
+    private static final String ENTITY_NAME = "purchase";
         
-    @Inject
-    private PurchaseService purchaseService;
+    private final PurchaseService purchaseService;
+
+    public PurchaseResource(PurchaseService purchaseService) {
+        this.purchaseService = purchaseService;
+    }
 
     /**
      * POST  /purchases : Create a new purchase.
@@ -42,13 +44,11 @@ public class PurchaseResource {
     public ResponseEntity<Purchase> createPurchase(@RequestBody Purchase purchase) throws URISyntaxException {
         log.debug("REST request to save Purchase : {}", purchase);
         if (purchase.getId() != null) {
-            return ResponseEntity.badRequest()
-            		.headers(HeaderUtil.createFailureAlert("purchase", "idexists", "A new purchase cannot already have an ID"))
-            		.body(null);
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new purchase cannot already have an ID")).body(null);
         }
-        Purchase result = purchaseService.doPurchase(purchase);
+        Purchase result = purchaseService.save(purchase);
         return ResponseEntity.created(new URI("/api/purchases/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert("purchase", result.getId().toString()))
+            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
@@ -68,9 +68,9 @@ public class PurchaseResource {
         if (purchase.getId() == null) {
             return createPurchase(purchase);
         }
-        Purchase result = purchaseService.doPurchase(purchase);
+        Purchase result = purchaseService.save(purchase);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert("purchase", purchase.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, purchase.getId().toString()))
             .body(result);
     }
 
@@ -97,9 +97,7 @@ public class PurchaseResource {
     public ResponseEntity<Purchase> getPurchase(@PathVariable Long id) {
         log.debug("REST request to get Purchase : {}", id);
         Purchase purchase = purchaseService.findOne(id);
-        return Optional.ofNullable(purchase)
-            .map(result -> new ResponseEntity<>(result,HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(purchase));
     }
 
     /**
@@ -113,7 +111,7 @@ public class PurchaseResource {
     public ResponseEntity<Void> deletePurchase(@PathVariable Long id) {
         log.debug("REST request to delete Purchase : {}", id);
         purchaseService.delete(id);
-        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("purchase", id.toString())).build();
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
 }

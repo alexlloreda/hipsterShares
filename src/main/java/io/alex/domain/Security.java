@@ -19,15 +19,13 @@ public class Security implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
 
     @NotNull
     @Column(name = "ticker", nullable = false)
     private String ticker;
-
-    @Column(name = "issued_units")
-    private Long issuedUnits;
 
     @Column(name = "spot_price", precision=10, scale=2)
     private BigDecimal spotPrice;
@@ -58,19 +56,6 @@ public class Security implements Serializable {
 
     public void setTicker(String ticker) {
         this.ticker = ticker;
-    }
-
-    public Long getIssuedUnits() {
-        return issuedUnits;
-    }
-
-    public Security issuedUnits(Long issuedUnits) {
-        this.issuedUnits = issuedUnits;
-        return this;
-    }
-
-    public void setIssuedUnits(Long issuedUnits) {
-        this.issuedUnits = issuedUnits;
     }
 
     public BigDecimal getSpotPrice() {
@@ -137,7 +122,6 @@ public class Security implements Serializable {
         return "Security{" +
             "id=" + id +
             ", ticker='" + ticker + "'" +
-            ", issuedUnits='" + issuedUnits + "'" +
             ", spotPrice='" + spotPrice + "'" +
             ", currency='" + currency + "'" +
             '}';

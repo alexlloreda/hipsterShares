@@ -1,26 +1,24 @@
 package io.alex.web.rest;
 
-import io.alex.SimpleApp;
+import io.alex.HipsterSharesApp;
 
 import io.alex.domain.Security;
 import io.alex.repository.SecurityRepository;
-import io.alex.service.SecurityService;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,14 +35,11 @@ import io.alex.domain.enumeration.Currency;
  * @see SecurityResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SimpleApp.class)
+@SpringBootTest(classes = HipsterSharesApp.class)
 public class SecurityResourceIntTest {
 
     private static final String DEFAULT_TICKER = "AAAAAAAAAA";
     private static final String UPDATED_TICKER = "BBBBBBBBBB";
-
-    private static final Long DEFAULT_ISSUED_UNITS = 1L;
-    private static final Long UPDATED_ISSUED_UNITS = 2L;
 
     private static final BigDecimal DEFAULT_SPOT_PRICE = new BigDecimal(1);
     private static final BigDecimal UPDATED_SPOT_PRICE = new BigDecimal(2);
@@ -52,19 +47,16 @@ public class SecurityResourceIntTest {
     private static final Currency DEFAULT_CURRENCY = Currency.AUD;
     private static final Currency UPDATED_CURRENCY = Currency.USD;
 
-    @Inject
+    @Autowired
     private SecurityRepository securityRepository;
 
-    @Inject
-    private SecurityService securityService;
-
-    @Inject
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
-    @Inject
+    @Autowired
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
-    @Inject
+    @Autowired
     private EntityManager em;
 
     private MockMvc restSecurityMockMvc;
@@ -74,8 +66,7 @@ public class SecurityResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        SecurityResource securityResource = new SecurityResource();
-        ReflectionTestUtils.setField(securityResource, "securityService", securityService);
+            SecurityResource securityResource = new SecurityResource(securityRepository);
         this.restSecurityMockMvc = MockMvcBuilders.standaloneSetup(securityResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -90,7 +81,6 @@ public class SecurityResourceIntTest {
     public static Security createEntity(EntityManager em) {
         Security security = new Security()
                 .ticker(DEFAULT_TICKER)
-                .issuedUnits(DEFAULT_ISSUED_UNITS)
                 .spotPrice(DEFAULT_SPOT_PRICE)
                 .currency(DEFAULT_CURRENCY);
         return security;
@@ -118,7 +108,6 @@ public class SecurityResourceIntTest {
         assertThat(securityList).hasSize(databaseSizeBeforeCreate + 1);
         Security testSecurity = securityList.get(securityList.size() - 1);
         assertThat(testSecurity.getTicker()).isEqualTo(DEFAULT_TICKER);
-        assertThat(testSecurity.getIssuedUnits()).isEqualTo(DEFAULT_ISSUED_UNITS);
         assertThat(testSecurity.getSpotPrice()).isEqualTo(DEFAULT_SPOT_PRICE);
         assertThat(testSecurity.getCurrency()).isEqualTo(DEFAULT_CURRENCY);
     }
@@ -173,7 +162,6 @@ public class SecurityResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(security.getId().intValue())))
             .andExpect(jsonPath("$.[*].ticker").value(hasItem(DEFAULT_TICKER.toString())))
-            .andExpect(jsonPath("$.[*].issuedUnits").value(hasItem(DEFAULT_ISSUED_UNITS.intValue())))
             .andExpect(jsonPath("$.[*].spotPrice").value(hasItem(DEFAULT_SPOT_PRICE.intValue())))
             .andExpect(jsonPath("$.[*].currency").value(hasItem(DEFAULT_CURRENCY.toString())));
     }
@@ -190,7 +178,6 @@ public class SecurityResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(security.getId().intValue()))
             .andExpect(jsonPath("$.ticker").value(DEFAULT_TICKER.toString()))
-            .andExpect(jsonPath("$.issuedUnits").value(DEFAULT_ISSUED_UNITS.intValue()))
             .andExpect(jsonPath("$.spotPrice").value(DEFAULT_SPOT_PRICE.intValue()))
             .andExpect(jsonPath("$.currency").value(DEFAULT_CURRENCY.toString()));
     }
@@ -207,15 +194,13 @@ public class SecurityResourceIntTest {
     @Transactional
     public void updateSecurity() throws Exception {
         // Initialize the database
-        securityService.save(security);
-
+        securityRepository.saveAndFlush(security);
         int databaseSizeBeforeUpdate = securityRepository.findAll().size();
 
         // Update the security
         Security updatedSecurity = securityRepository.findOne(security.getId());
         updatedSecurity
                 .ticker(UPDATED_TICKER)
-                .issuedUnits(UPDATED_ISSUED_UNITS)
                 .spotPrice(UPDATED_SPOT_PRICE)
                 .currency(UPDATED_CURRENCY);
 
@@ -229,7 +214,6 @@ public class SecurityResourceIntTest {
         assertThat(securityList).hasSize(databaseSizeBeforeUpdate);
         Security testSecurity = securityList.get(securityList.size() - 1);
         assertThat(testSecurity.getTicker()).isEqualTo(UPDATED_TICKER);
-        assertThat(testSecurity.getIssuedUnits()).isEqualTo(UPDATED_ISSUED_UNITS);
         assertThat(testSecurity.getSpotPrice()).isEqualTo(UPDATED_SPOT_PRICE);
         assertThat(testSecurity.getCurrency()).isEqualTo(UPDATED_CURRENCY);
     }
@@ -256,8 +240,7 @@ public class SecurityResourceIntTest {
     @Transactional
     public void deleteSecurity() throws Exception {
         // Initialize the database
-        securityService.save(security);
-
+        securityRepository.saveAndFlush(security);
         int databaseSizeBeforeDelete = securityRepository.findAll().size();
 
         // Get the security
@@ -268,5 +251,10 @@ public class SecurityResourceIntTest {
         // Validate the database is empty
         List<Security> securityList = securityRepository.findAll();
         assertThat(securityList).hasSize(databaseSizeBeforeDelete - 1);
+    }
+
+    @Test
+    public void equalsVerifier() throws Exception {
+        TestUtil.equalsVerifier(Security.class);
     }
 }

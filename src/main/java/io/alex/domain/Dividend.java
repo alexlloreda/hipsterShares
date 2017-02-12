@@ -17,7 +17,8 @@ public class Dividend implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
 
     @Column(name = "record_local_date")
@@ -36,7 +37,7 @@ public class Dividend implements Serializable {
     private BigDecimal franking;
 
     @ManyToOne
-    private Security owns;
+    private Security ofSecurity;
 
     public Long getId() {
         return id;
@@ -111,17 +112,17 @@ public class Dividend implements Serializable {
         this.franking = franking;
     }
 
-    public Security getOwns() {
-        return owns;
+    public Security getOfSecurity() {
+        return ofSecurity;
     }
 
-    public Dividend owns(Security security) {
-        this.owns = security;
+    public Dividend ofSecurity(Security security) {
+        this.ofSecurity = security;
         return this;
     }
 
-    public void setOwns(Security security) {
-        this.owns = security;
+    public void setOfSecurity(Security security) {
+        this.ofSecurity = security;
     }
 
     @Override

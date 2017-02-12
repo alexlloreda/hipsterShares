@@ -1,26 +1,24 @@
 package io.alex.web.rest;
 
-import io.alex.SimpleApp;
+import io.alex.HipsterSharesApp;
 
 import io.alex.domain.SecurityLot;
 import io.alex.repository.SecurityLotRepository;
-import io.alex.service.SecurityLotService;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -38,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see SecurityLotResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SimpleApp.class)
+@SpringBootTest(classes = HipsterSharesApp.class)
 public class SecurityLotResourceIntTest {
 
     private static final BigDecimal DEFAULT_PURCHASE_PRICE = new BigDecimal(1);
@@ -56,19 +54,16 @@ public class SecurityLotResourceIntTest {
     private static final Integer DEFAULT_UNITS = 1;
     private static final Integer UPDATED_UNITS = 2;
 
-    @Inject
+    @Autowired
     private SecurityLotRepository securityLotRepository;
 
-    @Inject
-    private SecurityLotService securityLotService;
-
-    @Inject
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
-    @Inject
+    @Autowired
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
-    @Inject
+    @Autowired
     private EntityManager em;
 
     private MockMvc restSecurityLotMockMvc;
@@ -78,8 +73,7 @@ public class SecurityLotResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        SecurityLotResource securityLotResource = new SecurityLotResource();
-        ReflectionTestUtils.setField(securityLotResource, "securityLotService", securityLotService);
+            SecurityLotResource securityLotResource = new SecurityLotResource(securityLotRepository);
         this.restSecurityLotMockMvc = MockMvcBuilders.standaloneSetup(securityLotResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -197,8 +191,7 @@ public class SecurityLotResourceIntTest {
     @Transactional
     public void updateSecurityLot() throws Exception {
         // Initialize the database
-        securityLotService.save(securityLot);
-
+        securityLotRepository.saveAndFlush(securityLot);
         int databaseSizeBeforeUpdate = securityLotRepository.findAll().size();
 
         // Update the securityLot
@@ -248,8 +241,7 @@ public class SecurityLotResourceIntTest {
     @Transactional
     public void deleteSecurityLot() throws Exception {
         // Initialize the database
-        securityLotService.save(securityLot);
-
+        securityLotRepository.saveAndFlush(securityLot);
         int databaseSizeBeforeDelete = securityLotRepository.findAll().size();
 
         // Get the securityLot
@@ -260,5 +252,10 @@ public class SecurityLotResourceIntTest {
         // Validate the database is empty
         List<SecurityLot> securityLotList = securityLotRepository.findAll();
         assertThat(securityLotList).hasSize(databaseSizeBeforeDelete - 1);
+    }
+
+    @Test
+    public void equalsVerifier() throws Exception {
+        TestUtil.equalsVerifier(SecurityLot.class);
     }
 }
