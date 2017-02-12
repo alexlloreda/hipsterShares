@@ -33,24 +33,25 @@ public class PurchaseService {
     private SecurityLotRepository securityLotRepo;
 
     /**
-     * Save a purchase.
+     * Purchase a security lot
      *
      * @param purchase the entity to save
      * @return the persisted entity
      */
-    public Purchase save(Purchase purchase) {
+    public Purchase doPurchase(Purchase purchase) {
         log.debug("Request to save Purchase : {}", purchase);
         // get the security referenced
-        //securityRepo.findByName(purchase.getOwns().getTicker());
-        SecurityLot lot = new SecurityLot();
-        lot.setPurchaseLocalDate(purchase.getLocalDate());
-        //lot.setPurchasePrice(purchase.get);
-        // create a new security block
-        //securityLotRepo.save(buildLot(ticker, amount, purchasePrice))
-        // save the transaction as a purchase
-        
-        Purchase result = purchaseRepository.save(purchase);
-        return result;
+        return securityRepo.findByTicker(purchase.getOwns().getTicker())
+        	.map(s -> {
+                // create a new security block
+        		SecurityLot lot = new SecurityLot();
+                lot.setPurchaseLocalDate(purchase.getLocalDate());
+                //lot.setPurchasePrice(purchase.getPrice());
+                //securityLotRepo.save(buildLot(ticker, amount, purchasePrice))
+                // save the transaction as a purchase
+                return purchaseRepository.save(purchase);
+        	})
+        	.orElseThrow(RuntimeException::new);
     }
 
     /**

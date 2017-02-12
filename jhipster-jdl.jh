@@ -1,6 +1,5 @@
 entity Security {
 	ticker String required,
-	issuedUnits Long,
 	spotPrice BigDecimal,
 	currency Currency
 }
@@ -27,7 +26,8 @@ entity Portfolio {
 
 entity Purchase {
 	units Integer,
-	LocalDate LocalDate
+	price BigDecimal,
+	purchaseDate LocalDate
 }
 
 entity Sale {
@@ -44,15 +44,15 @@ entity Dividend {
 }
 
 relationship OneToMany {
-	Company{owns} to Security,
+	Company{issues} to Security,
 	Portfolio{owns} to SecurityLot
 }
 
 relationship ManyToOne {
-	SecurityLot{owns} to Security,
-	Purchase{owns} to Security,
-	Sale{owns} to Security,
-	Dividend{owns} to Security	
+	SecurityLot{ofSecurity} to Security,
+	Purchase{ofSecurity} to Security,
+	Sale{ofSecurity} to Security,
+	Dividend{ofSecurity} to Security	
 }
 
 

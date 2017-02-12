@@ -175,7 +175,7 @@ public class PurchaseResourceIntTest {
     @Transactional
     public void updatePurchase() throws Exception {
         // Initialize the database
-        purchaseService.save(purchase);
+        purchaseService.doPurchase(purchase);
 
         int databaseSizeBeforeUpdate = purchaseRepository.findAll().size();
 
@@ -220,7 +220,7 @@ public class PurchaseResourceIntTest {
     @Transactional
     public void deletePurchase() throws Exception {
         // Initialize the database
-        purchaseService.save(purchase);
+        purchaseService.doPurchase(purchase);
 
         int databaseSizeBeforeDelete = purchaseRepository.findAll().size();
 

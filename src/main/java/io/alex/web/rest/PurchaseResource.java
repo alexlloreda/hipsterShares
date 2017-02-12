@@ -46,7 +46,7 @@ public class PurchaseResource {
             		.headers(HeaderUtil.createFailureAlert("purchase", "idexists", "A new purchase cannot already have an ID"))
             		.body(null);
         }
-        Purchase result = purchaseService.save(purchase);
+        Purchase result = purchaseService.doPurchase(purchase);
         return ResponseEntity.created(new URI("/api/purchases/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("purchase", result.getId().toString()))
             .body(result);
@@ -68,7 +68,7 @@ public class PurchaseResource {
         if (purchase.getId() == null) {
             return createPurchase(purchase);
         }
-        Purchase result = purchaseService.save(purchase);
+        Purchase result = purchaseService.doPurchase(purchase);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("purchase", purchase.getId().toString()))
             .body(result);
