@@ -20,12 +20,12 @@ bootRun {
     args = []
 }
 
-task webpack(type: YarnTask, dependsOn: 'yarn_install') {
-    args = ["run", "webpack:build:dev"]
+task webpackBuildDev(type: YarnTask) {
+    args = ["run", "webpack:build"]
 }
 
 war {
-    webAppDirName = 'src/main/webapp/'
+    webAppDirName = 'build/www/'
 }
 
 processResources {
@@ -36,10 +36,13 @@ processResources {
     }
     filesMatching('**/application.yml') {
         filter {
+            it.replace('#project.version#', version)
+        }
+        filter {
             it.replace('#spring.profiles.active#', profiles)
         }
     }
 }
 
-processResources.dependsOn webpack
-webpack.onlyIf { project.hasProperty('webpack') }
+processResources.dependsOn webpackBuildDev
+webpackBuildDev.onlyIf { project.hasProperty('webpack') }

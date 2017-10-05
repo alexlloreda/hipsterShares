@@ -1,6 +1,6 @@
 {
   "generator-jhipster": {
-    "jhipsterVersion": "4.0.2",
+    "jhipsterVersion": "4.9.0",
     "baseName": "hipsterShares",
     "packageName": "io.alex",
     "packageFolder": "io/alex",
@@ -26,6 +26,6 @@
     "jhiPrefix": "jhi",
     "enableTranslation": false,
     "serviceDiscoveryType": false,
-    "clientFramework": "angular2"
+    "clientFramework": "angularX"
   }
 }

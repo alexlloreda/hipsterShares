@@ -6,21 +6,21 @@ import { AuthServerProvider } from '../auth/auth-session.service';
 @Injectable()
 export class LoginService {
 
-    constructor (
+    constructor(
         private principal: Principal,
         private authServerProvider: AuthServerProvider
     ) {}
 
-    login (credentials, callback?) {
-        let cb = callback || function() {};
+    login(credentials, callback?) {
+        const cb = callback || function() {};
 
         return new Promise((resolve, reject) => {
-            this.authServerProvider.login(credentials).subscribe(data => {
-                this.principal.identity(true).then(account => {
+            this.authServerProvider.login(credentials).subscribe((data) => {
+                this.principal.identity(true).then((account) => {
                     resolve(data);
                 });
                 return cb();
-            }, err => {
+            }, (err) => {
                 this.logout();
                 reject(err);
                 return cb(err);
@@ -28,8 +28,10 @@ export class LoginService {
         });
     }
 
-    logout () {
-        this.authServerProvider.logout().subscribe();
+    logout() {
+        if (this.principal.isAuthenticated()) {
+            this.authServerProvider.logout().subscribe();
+        }
         this.principal.authenticate(null);
     }
 }

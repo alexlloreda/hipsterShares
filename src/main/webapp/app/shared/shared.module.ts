@@ -1,12 +1,10 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { CookieService } from 'angular2-cookie/services/cookies.service';
 import {
     HipsterSharesSharedLibsModule,
     HipsterSharesSharedCommonModule,
     CSRFService,
-    AuthService,
     AuthServerProvider,
     AccountService,
     UserService,
@@ -14,7 +12,6 @@ import {
     LoginService,
     LoginModalService,
     Principal,
-    HasAuthorityDirective,
     HasAnyAuthorityDirective,
     JhiLoginModalComponent
 } from './';
@@ -26,11 +23,9 @@ import {
     ],
     declarations: [
         JhiLoginModalComponent,
-        HasAuthorityDirective,
         HasAnyAuthorityDirective
     ],
     providers: [
-        CookieService,
         LoginService,
         LoginModalService,
         AccountService,
@@ -38,7 +33,6 @@ import {
         Principal,
         CSRFService,
         AuthServerProvider,
-        AuthService,
         UserService,
         DatePipe
     ],
@@ -46,7 +40,6 @@ import {
     exports: [
         HipsterSharesSharedCommonModule,
         JhiLoginModalComponent,
-        HasAuthorityDirective,
         HasAnyAuthorityDirective,
         DatePipe
     ],

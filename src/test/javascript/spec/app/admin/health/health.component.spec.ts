@@ -1,10 +1,8 @@
 import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { MockBackend } from '@angular/http/testing';
-import { Http, BaseRequestOptions } from '@angular/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { HipsterSharesTestModule } from '../../../test.module';
 import { JhiHealthCheckComponent } from '../../../../../../main/webapp/app/admin/health/health.component';
 import { JhiHealthService } from '../../../../../../main/webapp/app/admin/health/health.service';
-
 
 describe('Component Tests', () => {
 
@@ -16,29 +14,16 @@ describe('Component Tests', () => {
 
         beforeEach(async(() => {
             TestBed.configureTestingModule({
+                imports: [HipsterSharesTestModule],
                 declarations: [JhiHealthCheckComponent],
                 providers: [
-                    MockBackend,
-                    BaseRequestOptions,
-                    {
-                        provide: Http,
-                        useFactory: (backendInstance: MockBackend, defaultOptions: BaseRequestOptions) => {
-                            return new Http(backendInstance, defaultOptions);
-                        },
-                        deps: [MockBackend, BaseRequestOptions]
-                    },
                     JhiHealthService,
                     {
                         provide: NgbModal,
                         useValue: null
                     }
                 ]
-            })
-            .overrideComponent(JhiHealthCheckComponent, {
-                set: {
-                    template: ''
-                }
-            })
+            }).overrideTemplate(JhiHealthCheckComponent, '')
             .compileComponents();
         }));
 
@@ -90,7 +75,6 @@ describe('Component Tests', () => {
             const expected = [
                 {
                     'name': 'db',
-                    'error': undefined,
                     'status': 'UP',
                     'details': {
                         'database': 'H2',
@@ -134,7 +118,6 @@ describe('Component Tests', () => {
             const expected = [
                 {
                     'name': 'db',
-                    'error': undefined,
                     'status': 'UP',
                     'details': {
                         'database': 'H2',
@@ -148,7 +131,6 @@ describe('Component Tests', () => {
                 },
                 {
                     'name': 'system.subsystem1',
-                    'error': undefined,
                     'status': 'UP',
                     'details': {
                         'property1': 'system.subsystem1.property1'
@@ -195,7 +177,6 @@ describe('Component Tests', () => {
             const expected = [
                 {
                     'name': 'db',
-                    'error': undefined,
                     'status': 'UP',
                     'details': {
                         'database': 'H2',
@@ -209,7 +190,6 @@ describe('Component Tests', () => {
                 },
                 {
                     'name': 'system',
-                    'error': undefined,
                     'status': 'DOWN',
                     'details': {
                         'property1': 'system.property1'
@@ -217,7 +197,6 @@ describe('Component Tests', () => {
                 },
                 {
                     'name': 'system.subsystem1',
-                    'error': undefined,
                     'status': 'UP',
                     'details': {
                         'property1': 'system.subsystem1.property1'
@@ -264,7 +243,6 @@ describe('Component Tests', () => {
             const expected = [
                 {
                     'name': 'db',
-                    'error': undefined,
                     'status': 'UP',
                     'details': {
                         'database': 'H2',
@@ -283,7 +261,6 @@ describe('Component Tests', () => {
                 },
                 {
                     'name': 'system.subsystem1',
-                    'error': undefined,
                     'status': 'UP',
                     'details': {
                         'property1': 'system.subsystem1.property1'

@@ -6,6 +6,20 @@ body, h1, h2, h3, h4 {
     font-weight: 300;
 }
 
+body {
+    background: #e4e5e6;
+}
+
+a {
+    color: #533f03;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #533f03;
+    font-weight: bold;
+}
+
 /* ==========================================================================
 Browser Upgrade Prompt
 ========================================================================== */
@@ -31,7 +45,7 @@ Generic styles
 
 /* other generic styles */
 
-.card {
+.jh-card {
     padding: 1.5%;
     margin-top: 20px;
     border: none;
@@ -46,32 +60,22 @@ Generic styles
     padding: 10px;
 }
 
+.w-40 {
+    width: 40% !important;
+}
+
+.w-60 {
+    width: 60% !important;
+}
+
 .break {
     white-space: normal;
     word-break:break-all;
 }
 
-.voffset  { margin-top: 2px; }
-.voffset1 { margin-top: 5px; }
-.voffset2 { margin-top: 10px; }
-.voffset3 { margin-top: 15px; }
-.voffset4 { margin-top: 30px; }
-.voffset5 { margin-top: 40px; }
-.voffset6 { margin-top: 60px; }
-.voffset7 { margin-top: 80px; }
-.voffset8 { margin-top: 100px; }
-.voffset9 { margin-top: 150px; }
-
 .readonly {
     background-color: #eee;
     opacity: 1;
-}
-
-/*FIXME this is to support grids in table class; */
-table td[class*=col-], table th[class*=col-] {
-    position: static;
-    display: table-cell;
-    float: none;
 }
 
 .footer {
@@ -85,7 +89,7 @@ a:hover {
   cursor: pointer;
 }
 
-.hand {
+.hand, [jhisortby] {
     cursor: pointer;
 }
 
@@ -183,12 +187,12 @@ entity detail page css
 /* ==========================================================================
 ui bootstrap tweaks
 ========================================================================== */
-.nav, .pagination, .carousel, .panel-title a {
+.nav, .pagination, .carousel, .card-title a {
     cursor: pointer;
 }
 
-.datetime-picker-dropdown > li.date-picker-menu div > table .btn-default,
-.uib-datepicker-popup  > li > div.uib-datepicker > table .btn-default {
+.datetime-picker-dropdown > li.date-picker-menu div > table .btn-secondary,
+.uib-datepicker-popup  > li > div.uib-datepicker > table .btn-secondary {
     border: 0;
 }
 
