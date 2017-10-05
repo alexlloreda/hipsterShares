@@ -30,7 +30,7 @@ Navbar
     padding: 0.5em;
 }
 
-.jh-navbar .navbar-nav .nav-item+.nav-item {
+.jh-navbar .navbar-nav .nav-item {
     margin-left: 1.5rem;
 }
 
@@ -48,7 +48,11 @@ Navbar
     color: #fff;
 }
 
-
+@media screen and (min-width: 768px) {
+    .jh-navbar-toggler {
+        display: none;
+    }
+}
 
 @media screen and (max-width: 992px) {
     .jh-logo-container {

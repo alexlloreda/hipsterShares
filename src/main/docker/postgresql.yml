@@ -1,10 +1,9 @@
 version: '2'
 services:
     hipstershares-postgresql:
-        container_name: hipstershares-postgresql
-        image: postgres:9.5.4
+        image: postgres:9.6.5
         # volumes:
-        #     - ~/volumes/jhipster/hipsterShares/postgresql/:/var/lib/postgresql/
+        #     - ~/volumes/jhipster/hipsterShares/postgresql/:/var/lib/postgresql/data/
         environment:
             - POSTGRES_USER=hipsterShares
             - POSTGRES_PASSWORD=

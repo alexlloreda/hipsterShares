@@ -6,7 +6,7 @@ import { JhiHealthModalComponent } from './health-modal.component';
 
 @Component({
     selector: 'jhi-health',
-    templateUrl: './health.component.html',
+    templateUrl: './health.component.html'
 })
 export class JhiHealthCheckComponent implements OnInit {
     healthData: any;
@@ -16,7 +16,8 @@ export class JhiHealthCheckComponent implements OnInit {
         private modalService: NgbModal,
         private healthService: JhiHealthService
     ) {
-        }
+
+    }
 
     ngOnInit() {
         this.refresh();
@@ -26,21 +27,21 @@ export class JhiHealthCheckComponent implements OnInit {
         return this.healthService.getBaseName(name);
     }
 
-    getTagClass(statusState) {
+    getBadgeClass(statusState) {
         if (statusState === 'UP') {
-            return 'tag-success';
+            return 'badge-success';
         } else {
-            return 'tag-danger';
+            return 'badge-danger';
         }
     }
 
     refresh() {
         this.updatingHealth = true;
 
-        this.healthService.checkHealth().subscribe(health => {
+        this.healthService.checkHealth().subscribe((health) => {
             this.healthData = this.healthService.transformHealthData(health);
             this.updatingHealth = false;
-        }, error => {
+        }, (error) => {
             if (error.status === 503) {
                 this.healthData = this.healthService.transformHealthData(error.json());
                 this.updatingHealth = false;
@@ -52,9 +53,9 @@ export class JhiHealthCheckComponent implements OnInit {
         const modalRef  = this.modalService.open(JhiHealthModalComponent);
         modalRef.componentInstance.currentHealth = health;
         modalRef.result.then((result) => {
-            console.log(`Closed with: ${result}`);
+            // Left blank intentionally, nothing to do here
         }, (reason) => {
-            console.log(`Dismissed ${reason}`);
+            // Left blank intentionally, nothing to do here
         });
     }
 
