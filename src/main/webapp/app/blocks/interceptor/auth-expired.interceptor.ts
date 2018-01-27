@@ -3,8 +3,8 @@ import { Injector } from '@angular/core';
 import { RequestOptionsArgs, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { AuthServerProvider } from '../../shared/auth/auth-session.service';
-import { StateStorageService } from '../../shared/auth/state-storage.service';
 import { LoginModalService } from '../../shared/login/login-modal.service';
+import { StateStorageService } from '../../shared/auth/state-storage.service';
 
 export class AuthExpiredInterceptor extends JhiHttpInterceptor {
 
@@ -21,7 +21,7 @@ export class AuthExpiredInterceptor extends JhiHttpInterceptor {
 
     responseIntercept(observable: Observable<Response>): Observable<Response> {
         return <Observable<Response>> observable.catch((error) => {
-            if (error.status === 401 && error.text() !== '' && error.json().path && error.json().path.indexOf('/api/account') === -1) {
+            if (error.status === 401 && error.text() !== '' && error.json().path && !error.json().path.includes('/api/account')) {
                 const destination = this.stateStorageService.getDestinationState();
                 if (destination !== null) {
                     const to = destination.destination;

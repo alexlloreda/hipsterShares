@@ -29,9 +29,7 @@ export class LoginService {
     }
 
     logout() {
-        if (this.principal.isAuthenticated()) {
-            this.authServerProvider.logout().subscribe();
-        }
+        this.authServerProvider.logout().subscribe();
         this.principal.authenticate(null);
     }
 }
