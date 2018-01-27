@@ -33,7 +33,7 @@ import {
 @NgModule({
     imports: [
         HipsterSharesSharedModule,
-        RouterModule.forRoot(adminState, { useHash: true }),
+        RouterModule.forChild(adminState),
         /* jhipster-needle-add-admin-module - JHipster will add admin modules here */
     ],
     declarations: [

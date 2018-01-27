@@ -24,7 +24,7 @@ import {
 @NgModule({
     imports: [
         HipsterSharesSharedModule,
-        RouterModule.forRoot(accountState, { useHash: true })
+        RouterModule.forChild(accountState)
     ],
     declarations: [
         ActivateComponent,

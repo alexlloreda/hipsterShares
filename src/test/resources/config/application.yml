@@ -19,8 +19,6 @@ spring:
         name: hipsterShares
     jackson:
         serialization.write_dates_as_timestamps: false
-    cache:
-        type: none
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
         url: jdbc:h2:mem:hipsterShares;DB_CLOSE_DELAY=-1
@@ -55,10 +53,6 @@ spring:
 
 liquibase:
     contexts: test
-
-security:
-    basic:
-        enabled: false
 
 server:
     port: 10344

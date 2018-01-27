@@ -1,5 +1,7 @@
 import { NgModule, LOCALE_ID } from '@angular/core';
 import { Title } from '@angular/platform-browser';
+import { registerLocaleData } from '@angular/common';
+import locale from '@angular/common/locales/en';
 
 import {
     HipsterSharesSharedLibsModule,
@@ -28,4 +30,8 @@ import {
         JhiAlertErrorComponent
     ]
 })
-export class HipsterSharesSharedCommonModule {}
+export class HipsterSharesSharedCommonModule {
+    constructor() {
+        registerLocaleData(locale);
+    }
+}

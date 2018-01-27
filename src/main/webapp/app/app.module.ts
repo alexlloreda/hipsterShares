@@ -1,14 +1,15 @@
 import './vendor.ts';
+
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { Ng2Webstorage } from 'ng2-webstorage';
+import { Ng2Webstorage } from 'ngx-webstorage';
 
 import { HipsterSharesSharedModule, UserRouteAccessService } from './shared';
+import { HipsterSharesAppRoutingModule} from './app-routing.module';
 import { HipsterSharesHomeModule } from './home/home.module';
 import { HipsterSharesAdminModule } from './admin/admin.module';
 import { HipsterSharesAccountModule } from './account/account.module';
 import { HipsterSharesEntityModule } from './entities/entity.module';
-
 import { customHttpProvider } from './blocks/interceptor/http.provider';
 import { PaginationConfig } from './blocks/config/uib-pagination.config';
 
@@ -16,7 +17,6 @@ import { PaginationConfig } from './blocks/config/uib-pagination.config';
 
 import {
     JhiMainComponent,
-    LayoutRoutingModule,
     NavbarComponent,
     FooterComponent,
     ProfileService,
@@ -27,7 +27,7 @@ import {
 @NgModule({
     imports: [
         BrowserModule,
-        LayoutRoutingModule,
+        HipsterSharesAppRoutingModule,
         Ng2Webstorage.forRoot({ prefix: 'jhi', separator: '-'}),
         HipsterSharesSharedModule,
         HipsterSharesHomeModule,
