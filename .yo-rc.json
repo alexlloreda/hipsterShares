@@ -1,6 +1,6 @@
 {
   "generator-jhipster": {
-    "jhipsterVersion": "4.13.3",
+    "jhipsterVersion": "5.8.2",
     "baseName": "hipsterShares",
     "packageName": "io.alex",
     "packageFolder": "io/alex",
@@ -28,6 +28,9 @@
     "serviceDiscoveryType": false,
     "clientFramework": "angularX",
     "cacheProvider": "no",
-    "enableHibernateCache": false
+    "enableHibernateCache": false,
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": []
   }
 }
