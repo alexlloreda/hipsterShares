@@ -8,16 +8,29 @@ export const errorRoute: Routes = [
         component: ErrorComponent,
         data: {
             authorities: [],
-            pageTitle: 'Error page!'
-        },
+            pageTitle: 'hipsterShares'
+        }
     },
     {
         path: 'accessdenied',
         component: ErrorComponent,
         data: {
             authorities: [],
-            pageTitle: 'Error page!',
+            pageTitle: 'hipsterShares',
             error403: true
-        },
+        }
+    },
+    {
+        path: '404',
+        component: ErrorComponent,
+        data: {
+            authorities: [],
+            pageTitle: 'hipsterShares',
+            error404: true
+        }
+    },
+    {
+        path: '**',
+        redirectTo: '/404'
     }
 ];
